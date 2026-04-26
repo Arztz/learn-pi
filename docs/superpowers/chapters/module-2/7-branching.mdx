@@ -1,0 +1,101 @@
+---
+layout: '../../../src/layouts/ChapterLayout.astro'
+title: "Branching & forks"
+moduleName: "Module 2: Core Workflow"
+chapterNumber: 8
+readingTime: "10 min read"
+description: "Learn to use /tree, /fork, and /clone to explore alternative approaches."
+prevChapter:
+  title: "Sessions"
+  href: "/docs/superpowers/chapters/module-2/6-sessions"
+nextChapter:
+  title: "Extensions intro"
+  href: "/docs/superpowers/chapters/module-3/8-extensions-intro"
+---
+
+import Callout from '../../../src/components/Callout.astro';
+import AnimatedSequence from '../../../src/components/AnimatedSequence.astro';
+
+# Branching & forks
+
+Sessions support branching — try different approaches without losing your main work.
+
+## The /tree Command
+
+Press `Esc` twice to open the session tree navigator:
+
+```
+┌─────────────────────────────────────────────┐
+│  Session Tree                    Ctrl+O filter│
+├─────────────────────────────────────────────┤
+│  ○ User: Build auth                        │
+│  ● Assistant: Using JWT                    │
+│  ○ Tool: write auth.ts                     │
+│  ○ Tool: read auth.test.ts                 │
+│  ○ User: Actually use sessions             │
+│  ● Assistant: Ok, switching approach       │
+│  ○ Tool: edit auth.ts                      │
+└─────────────────────────────────────────────┘
+```
+
+Navigate with arrow keys, jump to any point, or branch from there.
+
+## Creating a Branch
+
+### /fork
+
+Create a new session from a previous user message:
+
+```
+/fork
+```
+
+This copies the path up to that point and opens an editor for your new prompt.
+
+### /clone
+
+Duplicate the current active branch into a new session:
+
+```
+/clone
+```
+
+Full history preserved, starts with an empty editor.
+
+## Animated: Branching Flow
+
+<AnimatedSequence
+  type="css"
+  steps={JSON.stringify([
+    { content: '<div style="text-align:center"><div class="node">Main Path: Build Auth (JWT)</div></div>', duration: 800 },
+    { content: '<div style="text-align:center"><div class="node">Main Path: Build Auth (JWT)</div><div style="margin-top:20px;color:#888">Esc Esc → /tree</div></div>', duration: 600 },
+    { content: '<div style="text-align:center"><div class="node">Branch at "Use sessions instead"</div></div>', duration: 800 },
+    { content: '<div style="display:flex;justify-content:center;gap:40px"><div><div class="node">Path A: JWT</div></div><div><div class="node">Path B: Sessions</div></div></div>', duration: 1000 }
+  ])}
+  title="Session Branching"
+/>
+
+## Why Branch?
+
+- **Compare approaches** — Try two different algorithms, see results side by side
+- **Experiment safely** — Don't break working code
+- **Consult old branches** — `/tree` to navigate back
+
+<Callout variant="tip" title="Best Practice">
+Create a branch when you're about to try something risky. If it works, merge (manually). If it fails, just navigate back to the main branch.
+</Callout>
+
+## Summary
+
+In this chapter you learned:
+
+- ✓ `/tree` opens session navigation (Esc Esc)
+- ✓ `/fork` creates branch from past message
+- ✓ `/clone` duplicates current branch to new session
+- ✓ All branches live in one file
+
+<div style="text-align: center; margin-top: 2rem;">
+  <a href="/docs/superpowers/chapters/module-3/8-extensions-intro" style="display: inline-block; padding: 0.75rem 1.5rem; background: var(--accent-primary); color: white; border-radius: 8px; text-decoration: none; font-weight: 500;">
+    Next: Extensions intro →
+  </a>
+</div>

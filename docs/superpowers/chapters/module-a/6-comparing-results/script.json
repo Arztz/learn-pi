@@ -1,0 +1,48 @@
+{
+  "turns": [
+    {
+      "role": "user",
+      "content": "Run parallel agents to implement a payment processor, then compare the results"
+    },
+    {
+      "role": "assistant",
+      "thinking": "The user wants me to run two agents in parallel to implement the same feature, then compare their approaches. This demonstrates the value of parallel agents for exploring different implementation strategies.",
+      "toolCalls": [
+        {
+          "name": "subagent",
+          "args": {
+            "mode": "parallel",
+            "tasks": [
+              { "agent": "dev-lead-a", "task": "Implement a payment processor using Stripe Charges API" },
+              { "agent": "dev-lead-b", "task": "Implement a payment processor using Stripe Payment Intents API" }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "role": "assistant",
+      "toolResult": {
+        "toolName": "subagent",
+        "content": "Running 2 agents in parallel...",
+        "isError": false
+      }
+    },
+    {
+      "role": "assistant",
+      "content": "## Agent A: Stripe Charges API Implementation\n\n```typescript\nclass PaymentProcessorA {\n  async processPayment(amount: number, currency: string) {\n    const charge = await stripe.charges.create({\n      amount,\n      currency,\n      source: 'tok_visa',\n    });\n    return { success: true, chargeId: charge.id };\n  }\n}\n```"
+    },
+    {
+      "role": "assistant",
+      "content": "## Agent B: Stripe Payment Intents API Implementation\n\n```typescript\nclass PaymentProcessorB {\n  async processPayment(amount: number, currency: string) {\n    const paymentIntent = await stripe.paymentIntents.create({\n      amount,\n      currency,\n      automatic_payment_methods: { enabled: true },\n    });\n    return { success: true, clientSecret: paymentIntent.client_secret };\n  }\n}\n```"
+    },
+    {
+      "role": "assistant",
+      "content": "## Side-by-Side Comparison\n\n| Aspect | Agent A (Charges) | Agent B (Payment Intents) |\n|--------|-------------------|---------------------------|\n| **API Style** | Legacy | Modern (recommended) |\n| **SCA Support** | Limited | Full support |\n| **3D Secure** | Manual handling | Automatic |\n| **Client Secret** | ❌ Not provided | ✅ For frontend confirmation |\n| **Future-proof** | Deprecation risk | Active development |\n\n## Recommendation: **Agent B's approach**\n\nPayment Intents API is Stripe's modern approach with:\n- Better security through SCA (Strong Customer Authentication)\n- Automatic handling of regulations like PSD2\n- Cleaner separation between backend and frontend\n- Active development and new features"
+    },
+    {
+      "role": "assistant",
+      "content": "<Callout variant=\"success\" title=\"Decision Made\">\nUsing Agent B's Payment Intents approach for better SCA compliance and future-proofing.\n</Callout>"
+    }
+  ]
+}

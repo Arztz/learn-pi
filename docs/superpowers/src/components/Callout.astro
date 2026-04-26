@@ -1,0 +1,132 @@
+---
+// Callout Component - Info, Tip, Warning, Error variants
+
+interface Props {
+  variant?: 'info' | 'tip' | 'warning' | 'error';
+  title?: string;
+}
+
+const { variant = 'info', title } = Astro.props;
+
+const icons = {
+  info: 'ℹ',
+  tip: '💡',
+  warning: '⚠',
+  error: '✕'
+};
+
+const defaultTitles = {
+  info: 'Info',
+  tip: 'Tip',
+  warning: 'Warning',
+  error: 'Error'
+};
+
+const displayTitle = title || defaultTitles[variant];
+---
+
+<div class={`callout callout-${variant}`} role="note">
+  <div class="callout-header">
+    <span class="callout-icon">{icons[variant]}</span>
+    <span class="callout-title">{displayTitle}</span>
+  </div>
+  <div class="callout-body">
+    <slot />
+  </div>
+</div>
+
+<style>
+  .callout {
+    margin: var(--space-5) 0;
+    padding: var(--space-4);
+    border-radius: var(--radius-md);
+    border-left: 3px solid;
+  }
+
+  /* Info */
+  .callout-info {
+    background-color: var(--tool-call-subtle);
+    border-color: var(--tool-call);
+  }
+
+  .callout-info .callout-icon,
+  .callout-info .callout-title {
+    color: var(--tool-call);
+  }
+
+  /* Tip */
+  .callout-tip {
+    background-color: var(--success-subtle);
+    border-color: var(--success);
+  }
+
+  .callout-tip .callout-icon,
+  .callout-tip .callout-title {
+    color: var(--success);
+  }
+
+  /* Warning */
+  .callout-warning {
+    background-color: var(--warning-subtle);
+    border-color: var(--warning);
+  }
+
+  .callout-warning .callout-icon,
+  .callout-warning .callout-title {
+    color: var(--warning);
+  }
+
+  /* Error */
+  .callout-error {
+    background-color: var(--error-subtle);
+    border-color: var(--error);
+  }
+
+  .callout-error .callout-icon,
+  .callout-error .callout-title {
+    color: var(--error);
+  }
+
+  /* Header */
+  .callout-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin-bottom: var(--space-3);
+  }
+
+  .callout-icon {
+    font-size: 1rem;
+  }
+
+  .callout-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+  }
+
+  /* Body */
+  .callout-body {
+    font-size: 0.875rem;
+    color: var(--text-primary);
+  }
+
+  .callout-body :global(p) {
+    margin-bottom: var(--space-2);
+    color: var(--text-primary);
+  }
+
+  .callout-body :global(p:last-child) {
+    margin-bottom: 0;
+  }
+
+  .callout-body :global(code) {
+    font-size: 0.8125rem;
+  }
+
+  .callout-body :global(ul),
+  .callout-body :global(ol) {
+    margin: var(--space-2) 0;
+    padding-left: var(--space-5);
+    color: var(--text-primary);
+  }
+</style>

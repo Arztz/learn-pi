@@ -1,0 +1,86 @@
+---
+layout: '../../../src/layouts/ChapterLayout.astro'
+title: "Agent Teams Overview"
+moduleName: "Module A: Agent Teams"
+chapterNumber: "A1"
+readingTime: "8 min read"
+description: "Understand what subagents are and how to define agent configurations."
+prevChapter:
+  title: "Event bus intro"
+  href: "/docs/superpowers/chapters/module-3/11-event-bus-intro"
+nextChapter:
+  title: "Single agent"
+  href: "/docs/superpowers/chapters/module-a/2-single-agent"
+---
+
+import Callout from '../../../src/components/Callout.astro';
+
+# Agent Teams Overview
+
+The subagent extension lets you spawn multiple agents that work together — like a team with different roles.
+
+## What is a Subagent?
+
+A subagent is a separate `pi` process with:
+- Its own **system prompt** (the agent definition)
+- Its own **tool set** (configurable per agent)
+- Its own **model** (optional override)
+- Isolated **context window**
+
+## Agent Definition Files
+
+Agents are Markdown files in `~/.pi/agent/agents/`:
+
+```markdown
+---
+name: scout
+description: Fast codebase reconnaissance
+tools: read,grep,find,ls,bash
+model: claude-haiku-4-5
+---
+
+You are a fast scout agent. Your job is to find relevant files
+and gather context quickly. Be concise and report only the facts.
+```
+
+## Agent Properties
+
+| Property | Purpose | Required |
+|----------|---------|----------|
+| `name` | Identifier for invocation | Yes |
+| `description` | Shown in subagent tool UI | Yes |
+| `tools` | Comma-separated tool list | No (all default) |
+| `model` | Specific model to use | No (inherits from parent) |
+| `systemPrompt` | The agent's instructions | Yes (after frontmatter) |
+
+<Callout variant="info" title="Tool Filtering">
+Agents can be restricted to specific tools. A "scout" agent might only get `read,grep,find,ls` — no write or bash — for safety.
+</Callout>
+
+## Agent Discovery
+
+| Location | Scope | Loading |
+|----------|-------|---------|
+| `~/.pi/agent/agents/` | User-level | Always |
+| `.pi/agents/` | Project-level | With `agentScope: "both"` |
+
+## Built-in Agents
+
+The subagent extension includes:
+
+| Agent | Purpose | Model | Tools |
+|-------|---------|-------|-------|
+| `scout` | Fast recon | Haiku | read,grep,find,ls,bash |
+| `planner` | Implementation plans | Sonnet | read,grep,find,ls |
+| `reviewer` | Code review | Sonnet | read,grep,find,ls,bash |
+| `worker` | General-purpose | Sonnet | all default |
+
+## Next Steps
+
+Next: Learn how to invoke a single agent.
+
+<div style="text-align: center; margin-top: 2rem;">
+  <a href="/docs/superpowers/chapters/module-a/2-single-agent" style="display: inline-block; padding: 0.75rem 1.5rem; background: var(--accent-primary); color: white; border-radius: 8px; text-decoration: none; font-weight: 500;">
+    Next: Single agent →
+  </a>
+</div>

@@ -1,0 +1,115 @@
+---
+layout: '../../../src/layouts/ChapterLayout.astro'
+title: "Commands & events"
+moduleName: "Module 3: Extending pi"
+chapterNumber: 11
+readingTime: "10 min read"
+description: "Register slash commands and listen to pi events for reactive extensions."
+prevChapter:
+  title: "Your first tool"
+  href: "/docs/superpowers/chapters/module-3/9-first-tool"
+nextChapter:
+  title: "Event bus intro"
+  href: "/docs/superpowers/chapters/module-3/11-event-bus-intro"
+---
+
+import Callout from '../../../src/components/Callout.astro';
+
+# Commands & events
+
+Extensions can register slash commands and listen to events throughout pi's lifecycle.
+
+## Registering Commands
+
+```typescript
+pi.registerCommand("hello", {
+  description: "Say hello with a custom message",
+  handler: async (args, ctx) => {
+    ctx.ui.notify(`Hello ${args || "world"}!`, "info");
+  },
+});
+```
+
+Now type `/hello` or `/hello Alice` in pi.
+
+## Event System
+
+Listen to pi events with `pi.on()`:
+
+```typescript
+// Tool called
+pi.on("tool_call", async (event, ctx) => {
+  console.log(`${event.toolName} was called with ${JSON.stringify(event.input)}`);
+});
+
+// Agent started processing
+pi.on("agent_start", async (_event, ctx) => {
+  ctx.ui.setStatus("my-ext", "Working...");
+});
+
+// Message sent
+pi.on("message_sent", async (event, ctx) => {
+  // Do something after user sends a message
+});
+```
+
+## Common Events
+
+| Event | When | Use Case |
+|-------|------|----------|
+| `session_start` | Session initialized | Initialize state |
+| `agent_start` | LLM starts processing | Update status |
+| `agent_end` | LLM finishes | Clear status |
+| `tool_call` | Tool is about to execute | Log, modify args |
+| `tool_result` | Tool execution done | Process results |
+| `message_sent` | User message sent | Track activity |
+
+## Using ctx.ui
+
+The context object provides UI methods:
+
+```typescript
+ctx.ui.notify("Hello!", "info");      // Show notification
+ctx.ui.confirm("Continue?", "Are you sure?");  // Yes/no dialog
+ctx.ui.select("Pick one", ["A", "B"]); // Choice dialog
+ctx.ui.setStatus("my-ext", "Busy");  // Footer status
+ctx.ui.setWidget("my-ext", ["Line"]);  // Widget above editor
+```
+
+<Callout variant="info" title="Async Handlers">
+Event handlers can be async. pi awaits them before continuing. This is useful for extensions that need to fetch data or call APIs.
+</Callout>
+
+## Putting It Together
+
+```typescript
+export default function (pi: ExtensionAPI) {
+  // Register command
+  pi.registerCommand("status", {
+    description: "Show extension status",
+    handler: async (_args, ctx) => {
+      ctx.ui.notify("Extension loaded!", "success");
+    },
+  });
+
+  // Listen to events
+  pi.on("tool_call", async (event, ctx) => {
+    if (event.toolName === "bash" && event.input.command?.includes("rm")) {
+      const ok = await ctx.ui.confirm("Dangerous!", "Allow rm command?");
+      if (!ok) return { block: true, reason: "Blocked by extension" };
+    }
+  });
+}
+```
+
+## Summary
+
+- ✓ `pi.registerCommand()` adds slash commands
+- ✓ `pi.on()` listens to events
+- ✓ `ctx.ui` provides notifications, dialogs, status
+
+<div style="text-align: center; margin-top: 2rem;">
+  <a href="/docs/superpowers/chapters/module-3/11-event-bus-intro" style="display: inline-block; padding: 0.75rem 1.5rem; background: var(--accent-primary); color: white; border-radius: 8px; text-decoration: none; font-weight: 500;">
+    Next: Event bus intro →
+  </a>
+</div>

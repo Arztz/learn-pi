@@ -1,0 +1,78 @@
+---
+layout: '../../../src/layouts/ChapterLayout.astro'
+title: "Parallel agents"
+moduleName: "Module A: Agent Teams"
+chapterNumber: "A3"
+readingTime: "8 min read"
+description: "Run multiple agents simultaneously to gather information faster."
+prevChapter:
+  title: "Single agent"
+  href: "/docs/superpowers/chapters/module-a/2-single-agent"
+nextChapter:
+  title: "Chain workflow"
+  href: "/docs/superpowers/chapters/module-a/4-chain-workflow"
+---
+
+import Callout from '../../../src/components/Callout.astro';
+
+# Parallel agents
+
+Run multiple agents at the same time for faster results.
+
+## Syntax
+
+```json
+{
+  "tasks": [
+    { "agent": "scout", "task": "Find all model files" },
+    { "agent": "scout", "task": "Find all view files" }
+  ]
+}
+```
+
+pi runs up to 4 agents concurrently (configurable).
+
+## Example
+
+```
+Run 2 scouts in parallel: one to find models, one to find views
+```
+
+This runs two scout agents simultaneously.
+
+## Output
+
+When all complete, results show together:
+
+```
+◐ Parallel: 2/2 done, 0 running
+
+✓ scout (user)
+   Found 3 model files:
+   - src/models/User.ts
+   - src/models/Post.ts
+   - src/models/Comment.ts
+
+✓ scout (user)
+   Found 2 view files:
+   - src/views/Home.tsx
+   - src/views/Dashboard.tsx
+
+   ↑2.4k ↓1.7k R256 W128 $0.0042 ctx:16,468
+```
+
+## Use Cases
+
+- **Parallel research** — Find files, then combine results
+- **Multi-perspective analysis** — Different agents review different aspects
+- **Speed** — 2x agents = ~2x faster (with concurrency limits)
+
+<Callout variant="info" title="Concurrency Limits">
+Max 8 parallel tasks, max 4 concurrent. Excess tasks queue. This prevents resource exhaustion.
+</Callout>
+
+<div style="text-align: center; margin-top: 2rem;">
+  <a href="/docs/superpowers/chapters/module-a/4-chain-workflow" style="display: inline-block; padding: 0.75rem 1.5rem; background: var(--accent-primary); color: white; border-radius: 8px; text-decoration: none; font-weight: 500;">
+    Next: Chain workflow →
+  </a>
+</div>

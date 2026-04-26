@@ -1,0 +1,101 @@
+---
+layout: '../../../src/layouts/ChapterLayout.astro'
+title: "Bash commands"
+moduleName: "Module 2: Core Workflow"
+chapterNumber: 6
+readingTime: "6 min read"
+description: "Run shell commands with ! and !! syntax, understand working directory."
+prevChapter:
+  title: "Writing & editing"
+  href: "/docs/superpowers/chapters/module-2/4-writing-editing"
+nextChapter:
+  title: "Sessions"
+  href: "/docs/superpowers/chapters/module-2/6-sessions"
+---
+
+import Callout from '../../../src/components/Callout.astro';
+
+# Bash commands
+
+pi lets you run shell commands directly using the `bash` tool with special prefixes.
+
+## The ! Prefix
+
+Type `!` before a command to run it AND send the output to the LLM:
+
+```
+!ls -la
+```
+
+This runs `ls -la` and includes the output in the conversation context.
+
+## The !! Prefix (Silent)
+
+Type `!!` before a command to run it WITHOUT sending output to the LLM:
+
+```
+!!npm install
+```
+
+Useful for installing packages where you don't need the LLM to see the full output.
+
+## How It Works
+
+```
+> !git status
+
+ℹ bash { command: "git status" }
+
+✓ Tool: bash
+   On branch main
+   Your branch is up to date with 'origin/main'.
+
+   nothing to commit, working tree clean
+```
+
+## Common Use Cases
+
+| Command | Purpose |
+|---------|---------|
+| `!git status` | Check repository state |
+| `!npm test` | Run tests |
+| `!!npm install` | Install deps silently |
+| `!ls src/` | List source files |
+| `!!make build` | Build project silently |
+
+## Working Directory
+
+Commands run in the same directory where you started pi. To change:
+
+```
+> !cd src && ls
+```
+
+Or start pi from the directory you want to work in.
+
+<Callout variant="info" title="Long Running Commands">
+For long-running commands (servers, watchers), pi will show output as it comes. Use Ctrl+C to abort.
+</Callout>
+
+## Shell Features
+
+pi passes commands to your default shell (`bash`, `zsh`, `fish`), so you can use:
+
+- Pipes: `!cat file.txt | grep pattern`
+- Environment variables: `!echo $HOME`
+- Aliases: `!ll` (if defined in your shell)
+- Globbing: `!ls src/**/*.ts`
+
+## Exercises
+
+Try these in pi:
+
+1. `"!node --version"` — Check Node version
+2. `"!npm run build"` — Build the project
+3. `"!!npm install --save lodash"` — Silent install
+
+<div style="text-align: center; margin-top: 2rem;">
+  <a href="/docs/superpowers/chapters/module-2/6-sessions" style="display: inline-block; padding: 0.75rem 1.5rem; background: var(--accent-primary); color: white; border-radius: 8px; text-decoration: none; font-weight: 500;">
+    Next: Sessions →
+  </a>
+</div>

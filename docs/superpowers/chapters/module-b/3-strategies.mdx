@@ -1,0 +1,210 @@
+---
+layout: '../../../src/layouts/ChapterLayout.astro'
+title: "Strategies"
+moduleName: "Module B: Persistent Memory"
+chapterNumber: "B3"
+readingTime: "6 min read"
+description: "Best practices for managing context and when to trigger compaction manually."
+prevChapter:
+  title: "Compaction"
+  href: "/docs/superpowers/chapters/module-b/2-compaction"
+nextChapter:
+  title: "Module C: Event Bus"
+  href: "/docs/superpowers/chapters/module-c/1-event-bus-deep"
+---
+
+import Callout from '../../../src/components/Callout.astro';
+
+# Strategies
+
+Maximize pi's memory effectiveness with these proven strategies.
+
+## When to Compact Manually
+
+### Before Major Changes
+
+Always compact before:
+
+- **Architecture refactors** — "Let's move to microservices"
+- **Technology switches** — "Replace Redux with Zustand"
+- **Large migrations** — "Migrate to Next.js App Router"
+- **Team changes** — Onboarding new developers
+
+```bash
+/compact
+# Then verify with:
+/sessions --view latest
+```
+
+### After Milestones
+
+Compact at natural project boundaries:
+
+| Milestone | Why Compact |
+|-----------|-------------|
+| Feature complete | Clean slate for next feature |
+| Sprint end | Summarize decisions made |
+| Release | Document final state |
+| Post-mortem | Capture lessons learned |
+
+### When Context Feels Stale
+
+Signs you need compaction:
+
+- pi gives contradictory advice
+- pi mentions "old" technologies
+- Recommendations don't match recent decisions
+- You feel like re-explaining things
+
+## Best Practices
+
+### Do: Keep Decisions Explicit
+
+Help pi understand important context:
+
+```typescript
+// Good: Explicit rationale
+// We chose useEffect over useLayoutEffect because:
+// 1. No need for synchronous paint block
+// 2. Better for data fetching (async anyway)
+// 3. Simpler mental model for team
+const useUserData = (userId: string) => {
+  const [user, setUser] = useState(null);
+  useEffect(() => {
+    fetchUser(userId).then(setUser);
+  }, [userId]);
+  return user;
+};
+```
+
+<Callout variant="tip" title="Comments = Memory">
+Well-placed comments become part of the compacted context. They're your gift to future-you (and pi).
+</Callout>
+
+### Don't: Rely on Implicit Knowledge
+
+Bad: "It's obvious we should use the existing auth pattern"
+
+Good: "Follow the auth pattern from src/lib/auth.ts—same JWT approach"
+
+### Do: Name Things Clearly
+
+pi can only remember what it can reference:
+
+```typescript
+// Bad: Generic names
+const data = await getData();
+const result = process(data);
+
+// Good: Descriptive names
+const userPreferences = await fetchUserPreferences(userId);
+const validatedPreferences = validatePreferences(userPreferences);
+```
+
+### Don't: Over-Compact
+
+Compaction is lossy. Don't compact:
+
+- Before reviewing the output
+- Multiple times in one day (usually)
+- When mid-feature (you might need the details)
+
+## Context Management Tips
+
+### Session Start
+
+At the start of each session, orient pi:
+
+```bash
+/resume
+# Then optionally:
+This session continues the checkout flow.
+We're using Stripe Payment Intents (not Charges).
+Next: Implement webhook handler.
+```
+
+### During Work
+
+Periodically summarize progress:
+
+```bash
+# When you hit a good stopping point:
+"Summary so far: completed checkout UI, stubbed API endpoint.
+Next session: implement the webhook handler."
+```
+
+### Project-Level Notes
+
+Create `PI.md` for permanent context:
+
+```markdown
+# Project Notes for pi
+
+## Architecture
+- Next.js 14 App Router
+- Server Components by default, 'use client' only when needed
+- PostgreSQL + Prisma
+
+## Conventions
+- Components: src/components/[feature]/
+- API routes: app/api/[resource]/route.ts
+- Tests: __tests__/ next to source files
+
+## Important Context
+- We're building an MVP—no premature optimization
+- Design system: Radix UI + Tailwind
+```
+
+<Callout variant="info" title="PI.md">
+Place a `PI.md` file in your project root. pi reads it on session start as extra context.
+</Callout>
+
+## Custom Compaction Extensions
+
+For advanced users, create custom compaction:
+
+```typescript
+// ~/.pi/extensions/compaction-enhance.ts
+export const compactionEnhance = {
+  name: 'compaction-enhance',
+  version: '1.0.0',
+
+  onCompaction: async (entry: CompactionEntry) => {
+    // Add custom fields
+    entry.summary.custom = {
+      teamConventions: extractFromComments('CONVENTION'),
+      techRadar = analyzeDependencies(),
+    };
+    return entry;
+  }
+};
+```
+
+## Summary
+
+Effective memory management:
+
+| Strategy | When |
+|----------|------|
+| Manual compaction | Before major changes, milestones |
+| Clear naming | Always |
+| Explicit comments | For decisions, not boilerplate |
+| PI.md | Project-level context |
+| Custom extensions | For advanced automation |
+
+<Callout variant="success" title="Module B Complete!">
+You've learned how pi manages persistent memory:
+
+- Sessions stored as JSONL files
+- Automatic compaction when context grows
+- Manual compaction for precise control
+- Best practices for maintaining context
+
+Next: **Module C** on the event bus for extension communication.
+</Callout>
+
+<div style="text-align: center; margin-top: 2rem;">
+  <a href="/docs/superpowers/chapters/module-c/1-event-bus-deep" style="display: inline-block; padding: 0.75rem 1.5rem; background: var(--accent-primary); color: white; border-radius: 8px; text-decoration: none; font-weight: 500;">
+    Next: Module C - Event Bus →
+  </a>
+</div>

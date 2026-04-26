@@ -1,0 +1,167 @@
+---
+layout: '../../../src/layouts/ChapterLayout.astro'
+title: "Comparing results"
+moduleName: "Module A: Agent Teams"
+chapterNumber: "A6"
+readingTime: "8 min read"
+description: "Analyze and compare outputs from multiple agents to choose the best approach."
+prevChapter:
+  title: "Tech lead pattern"
+  href: "/docs/superpowers/chapters/module-a/5-tech-lead-pattern"
+nextChapter:
+  title: "Module B: Persistent Memory"
+  href: "/docs/superpowers/chapters/module-b/1-memory-intro"
+---
+
+import Callout from '../../../src/components/Callout.astro';
+
+# Comparing results
+
+When multiple agents work on the same or related tasks, their outputs may differ. This chapter teaches you how to analyze and choose between alternatives.
+
+## Why Compare?
+
+With parallel agents and the tech lead pattern, you often get:
+
+- **Multiple implementations** of the same feature
+- **Different architectural approaches**
+- **Varying code styles and patterns**
+- **Conflicting recommendations**
+
+<Callout variant="info" title="Parallel Agents = Options">
+When you run agents in parallel, you're explicitly creating options to evaluate. Be prepared to compare and choose.
+</Callout>
+
+## Comparison Framework
+
+Use this framework when evaluating multiple agent outputs:
+
+| Criteria | Questions to Ask |
+|----------|------------------|
+| **Correctness** | Does it actually solve the problem? |
+| **Performance** | Any efficiency concerns? |
+| **Maintainability** | Will future developers understand it? |
+| **Style consistency** | Does it match your codebase patterns? |
+| **Complexity** | Is it simpler or more complex than needed? |
+
+## Side-by-Side Analysis
+
+When comparing code, structure your analysis:
+
+```markdown
+## Implementation A vs Implementation B
+
+### Approach
+- **A:** Uses class components with HOC
+- **B:** Uses functional components with hooks
+
+### Trade-offs
+- **A:** More verbose, but explicit lifecycle
+- **B:** More concise, but requires hook understanding
+
+### Recommendation
+B, because: [your reasoning]
+```
+
+## Example: Dev Lead A vs Dev Lead B
+
+Imagine both Dev Leads implemented a payment processor:
+
+**Dev Lead A's approach:**
+```typescript
+class PaymentProcessor {
+  async processPayment(amount: number) {
+    const result = await stripe.charges.create({...});
+    return result;
+  }
+}
+```
+
+**Dev Lead B's approach:**
+```typescript
+const processPayment = async (amount: number) => {
+  const paymentIntent = await stripe.paymentIntents.create({...});
+  return paymentIntent;
+};
+```
+
+### Comparing the Options
+
+| Aspect | A (Charges API) | B (Payment Intents API) |
+|--------|-----------------|-------------------------|
+| **Modern** | No (legacy) | Yes (recommended) |
+| **SCA support** | Limited | Full support |
+| **3D Secure** | Manual | Automatic |
+| **Code style** | Class-based | Functional |
+
+<Callout variant="tip" title="Key Insight">
+Dev Lead B's approach uses the newer Payment Intents API with better SCA (Strong Customer Authentication) support. This is the recommended approach for new implementations.
+</Callout>
+
+## Resolving Conflicts
+
+When agents disagree:
+
+1. **Identify the core disagreement** - Is it technical, stylistic, or architectural?
+2. **Check documentation** - Do official docs support one approach?
+3. **Consider context** - Does codebase history favor one pattern?
+4. **Make a decision** - You're the orchestrator; trust your judgment
+5. **Document the decision** - Explain why for future reference
+
+```markdown
+## Decision: Use Payment Intents API (Dev Lead B's approach)
+
+Rationale:
+- Stripe's recommended approach for new integrations
+- Better SCA compliance out of the box
+- More granular control over payment flow
+
+Alternatives considered: Charges API (simpler but legacy)
+```
+
+## Best Practices
+
+### Do
+
+- **Compare outputs systematically** using a structured framework
+- **Trust your expertise** - You understand your codebase best
+- **Document decisions** - Helps future maintainers
+- **Ask agents to justify** - "Why did you choose this approach?"
+
+### Don't
+
+- **Pick arbitrarily** - Every choice has trade-offs
+- **Ignore conflicts** - Address disagreements explicitly
+- **Over-engineer** - Sometimes "good enough" is sufficient
+- **Forget the goal** - The comparison should serve the project
+
+<Callout variant="warning" title="Common Mistake">
+Don't spend too long comparing minor differences. Focus on significant trade-offs that affect correctness, performance, or maintainability.
+</Callout>
+
+## Summary
+
+Comparing agent outputs is a core skill when working with multi-agent systems:
+
+1. **Parallel agents create options** — Be ready to evaluate
+2. **Use a structured framework** — Correctness, performance, maintainability, style, complexity
+3. **Document decisions** — Your future self will thank you
+4. **Trust your judgment** — You know your codebase best
+
+<Callout variant="success" title="Module A Complete!">
+You've learned the fundamentals of multi-agent systems in pi:
+
+- Single agents for focused tasks
+- Parallel agents for independent work
+- Chain workflow for dependent tasks
+- Tech lead pattern for complex coordination
+- Comparing results to make informed decisions
+
+Next up: **Module B** on persistent memory.
+</Callout>
+
+<div style="text-align: center; margin-top: 2rem;">
+  <a href="/docs/superpowers/chapters/module-b/1-memory-intro" style="display: inline-block; padding: 0.75rem 1.5rem; background: var(--accent-primary); color: white; border-radius: 8px; text-decoration: none; font-weight: 500;">
+    Next: Module B - Memory intro →
+  </a>
+</div>

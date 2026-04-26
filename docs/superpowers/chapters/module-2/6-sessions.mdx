@@ -1,0 +1,130 @@
+---
+layout: '../../../src/layouts/ChapterLayout.astro'
+title: "Sessions"
+moduleName: "Module 2: Core Workflow"
+chapterNumber: 7
+readingTime: "10 min read"
+description: "Understand how pi saves conversations as JSONL files with tree structure."
+prevChapter:
+  title: "Bash commands"
+  href: "/docs/superpowers/chapters/module-2/5-bash"
+nextChapter:
+  title: "Branching & forks"
+  href: "/docs/superpowers/chapters/module-2/7-branching"
+---
+
+import Callout from '../../../src/components/Callout.astro';
+import InteractiveDiagram from '../../../src/components/InteractiveDiagram.astro';
+
+# Sessions
+
+pi saves your conversations as **session files** — JSONL files with a tree structure that lets you navigate history.
+
+## How Sessions Work
+
+Every time you start pi, it creates or continues a session:
+
+```bash
+pi                    # Continue most recent session
+pi -c                 # Same as above (continue)
+pi -r                 # Resume - browse and pick a session
+pi --session <id>     # Open specific session
+```
+
+Sessions are stored in `~/.pi/agent/sessions/` organized by project directory.
+
+## Session File Format
+
+Sessions are **JSONL** (JSON Lines) — one JSON object per line:
+
+```json
+{"type":"session","version":3,"id":"abc123","cwd":"/project"}
+{"type":"message","id":"001","parentId":null,...}
+{"type":"message","id":"002","parentId":"001",...}
+{"type":"message","id":"003","parentId":"002",...}
+```
+
+### Entry Types
+
+| Type | Purpose |
+|------|---------|
+| `session` | Header with version, ID, working directory |
+| `message` | User or assistant message |
+| `toolCall` | LLM tool invocation |
+| `toolResult` | Tool execution result |
+| `compaction` | Context summarization |
+| `branch_summary` | Branch point summary |
+
+## Tree Structure
+
+Sessions form a **tree** — not a linear list. This means:
+
+```
+User: "Build auth"
+  Assistant: "I'll add JWT..."
+    Tool: write auth.ts
+    Tool: read auth.test.ts
+  User: "Actually, use sessions instead"
+    Assistant: "Ok, let me change..."
+      Tool: edit auth.ts
+    Tool: write session-auth.ts
+```
+
+You can **branch** at any point to try different approaches!
+
+## Session Diagram
+
+<InteractiveDiagram
+  type="d3"
+  config={JSON.stringify({
+    nodes: [
+      { id: 'root', label: 'User: Build auth', level: 0 },
+      { id: 'a1', label: 'Assistant: JWT approach', level: 1 },
+      { id: 'a2', label: 'User: Use sessions', level: 2 },
+      { id: 'a3a', label: 'Assistant: Done (JWT)', level: 3 },
+      { id: 'a3b', label: 'Assistant: Done (Sessions)', level: 3 }
+    ],
+    links: [
+      { from: 'root', to: 'a1' },
+      { from: 'a1', to: 'a2' },
+      { from: 'a2', to: 'a3a' },
+      { from: 'a2', to: 'a3b' }
+    ]
+  })}
+  title="Session Tree Example"
+/>
+
+## Navigating with /resume
+
+Type `/resume` in pi to see all your sessions:
+
+```
+┌─────────────────────────────────────────────┐
+│  Sessions for ~/projects/my-app            │
+├─────────────────────────────────────────────┤
+│  ● main (current) - 47 messages            │
+│  ○ auth-refactor - 23 messages             │
+│  ○ feature-webhooks - 12 messages         │
+└─────────────────────────────────────────────┘
+```
+
+Press Enter to continue the selected session.
+
+<Callout variant="info" title="Session Switching">
+You can have multiple sessions for the same project. Use `/resume` to switch between different work contexts.
+</Callout>
+
+## Summary
+
+In this chapter you learned:
+
+- ✓ Sessions are JSONL files with tree structure
+- ✓ Each entry has `id` and `parentId` for navigation
+- ✓ Use `/resume` to browse and switch sessions
+- ✓ Multiple sessions per project supported
+
+<div style="text-align: center; margin-top: 2rem;">
+  <a href="/docs/superpowers/chapters/module-2/7-branching" style="display: inline-block; padding: 0.75rem 1.5rem; background: var(--accent-primary); color: white; border-radius: 8px; text-decoration: none; font-weight: 500;">
+    Next: Branching & forks →
+  </a>
+</div>

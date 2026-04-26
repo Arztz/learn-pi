@@ -1,0 +1,89 @@
+---
+layout: '../../../src/layouts/ChapterLayout.astro'
+title: "Reading files"
+moduleName: "Module 2: Core Workflow"
+chapterNumber: 4
+readingTime: "7 min read"
+description: "Learn to use @-references for file paths and how pi reads file contents."
+prevChapter:
+  title: "Hello, pi!"
+  href: "/docs/superpowers/chapters/module-1/2-hello-pi"
+nextChapter:
+  title: "Writing & editing"
+  href: "/docs/superpowers/chapters/module-2/4-writing-editing"
+---
+
+import Callout from '../../../src/components/Callout.astro';
+
+# Reading files
+
+pi makes it easy to include files in your prompts using `@`-references and the `read` tool.
+
+## The @ Reference Syntax
+
+Include a file directly in your conversation by typing `@` followed by the path:
+
+```
+@README.md "What does this project do?"
+```
+
+pi will read the file and include its contents in the context for the LLM.
+
+<Callout variant="tip" title="Tab Completion">
+Type `@` and press Tab to see available files. Type `@src/` to filter by directory.
+</Callout>
+
+## Multiple Files
+
+Reference several files at once:
+
+```
+@src/index.ts @src/utils/helpers.ts "Compare these two files"
+```
+
+The LLM sees all referenced files in context.
+
+## The read Tool
+
+When pi needs to read a file (e.g., you ask "what's in this file?"), it uses the `read` tool:
+
+```
+ℹ read { file_path: "src/index.ts", offset: 1, limit: 50 }
+```
+
+| Parameter | Meaning |
+|-----------|---------|
+| `file_path` | Path to the file |
+| `offset` | Starting line (1-indexed, optional) |
+| `limit` | Number of lines to read (optional) |
+
+## Reading Specific Sections
+
+Get just part of a long file:
+
+```
+Read lines 100-150 of the big-log.txt file
+```
+
+This uses `offset: 100` and `limit: 50`.
+
+## Common Use Cases
+
+- **Code review**: `@src/components/Button.ts "Suggest improvements"`
+- **Debugging**: `@error.log "What caused this error?"`
+- **Documentation**: `@docs/api.md "Summarize the API"`
+- **Comparing**: `@old.ts @new.ts "What's different?"`
+
+## Exercises
+
+Try these in pi:
+
+1. `"@package.json What are the main dependencies?"`
+2. `"Show me the first 20 lines of src/index.ts"`
+3. `"@src/*.ts Count how many TypeScript files are in src/"`
+
+<div style="text-align: center; margin-top: 2rem;">
+  <a href="/docs/superpowers/chapters/module-2/4-writing-editing" style="display: inline-block; padding: 0.75rem 1.5rem; background: var(--accent-primary); color: white; border-radius: 8px; text-decoration: none; font-weight: 500;">
+    Next: Writing & editing →
+  </a>
+</div>

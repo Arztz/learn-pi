@@ -1,0 +1,17 @@
+{
+  "turns": [
+    {
+      "role": "user",
+      "content": "I'm about to do a major refactor. Any tips?"
+    },
+    {
+      "role": "assistant",
+      "thinking": "The user is about to do a major refactor and wants best practices for managing context. I should recommend manual compaction and other strategies.",
+      "content": "Great timing! Here are my recommendations for major refactors:\n\n## Before You Refactor\n\n1. **Run `/compact`** - Clean context before starting\n2. **Create a PI.md** - Document the new architecture\n3. **Summarize recent work** - Help pi understand current state\n\n## Example PI.md for Refactor\n\n```markdown\n# Refactor: Moving to Microservices\n\n## Current State\n- Monolithic Express app\n- Single database\n\n## Target State\n- User service (Node.js)\n- Order service (Python)\n- Shared API gateway\n\n## Migration Strategy\n- Strangler fig pattern\n- New code goes to services\n- Legacy code wraps services\n```"
+    },
+    {
+      "role": "assistant",
+      "content": "## During Refactor\n\n| Tip | Why It Helps |\n|-----|-------------|\n| Compact often | Stay within context limits |\n| Use branch sessions | Isolate experimental work |\n| Document decisions | Comments become memory |\n| Name things clearly | Descriptive names = better context |\n\n## After Refactor\n\n1. Run `/compact` again\n2. Update PI.md with final architecture\n3. Write a summary for future-you\n\nThis keeps context clean and pi effective throughout!"
+    }
+  ]
+}

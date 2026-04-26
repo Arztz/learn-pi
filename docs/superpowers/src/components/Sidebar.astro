@@ -1,0 +1,391 @@
+---
+// Sidebar Component - Navigation with collapsible modules
+---
+
+<nav class="sidebar" id="sidebar" role="navigation" aria-label="Chapter navigation">
+  <div class="sidebar-header">
+    <a href="/docs/superpowers/" class="sidebar-title">
+      <span class="sidebar-logo">◉</span>
+      <span>Pi Learning Guide</span>
+    </a>
+  </div>
+
+  <div class="sidebar-content">
+    <!-- Module 1: Getting Started -->
+    <div class="module" data-module="1">
+      <button class="module-header" aria-expanded="true" aria-controls="module-1-chapters">
+        <span class="module-arrow">▼</span>
+        <span class="module-number">01</span>
+        <span class="module-title">Getting Started</span>
+      </button>
+      <ul class="chapter-list" id="module-1-chapters">
+        <li><a href="/docs/superpowers/chapters/module-1/0-what-is-pi" class="chapter-link" data-chapter="1-0"><span class="chapter-number">01</span><span class="chapter-name">What is pi?</span></a></li>
+        <li><a href="/docs/superpowers/chapters/module-1/1-install" class="chapter-link" data-chapter="1-1"><span class="chapter-number">02</span><span class="chapter-name">Install in 5 minutes</span></a></li>
+        <li><a href="/docs/superpowers/chapters/module-1/2-hello-pi" class="chapter-link" data-chapter="1-2"><span class="chapter-number">03</span><span class="chapter-name">Hello, pi!</span></a></li>
+      </ul>
+    </div>
+
+    <!-- Module 2: Core Workflow -->
+    <div class="module" data-module="2">
+      <button class="module-header" aria-expanded="true" aria-controls="module-2-chapters">
+        <span class="module-arrow">▼</span>
+        <span class="module-number">02</span>
+        <span class="module-title">Core Workflow</span>
+      </button>
+      <ul class="chapter-list" id="module-2-chapters">
+        <li><a href="/docs/superpowers/chapters/module-2/3-reading-files" class="chapter-link" data-chapter="2-3"><span class="chapter-number">04</span><span class="chapter-name">Reading files</span></a></li>
+        <li><a href="/docs/superpowers/chapters/module-2/4-writing-editing" class="chapter-link" data-chapter="2-4"><span class="chapter-number">05</span><span class="chapter-name">Writing & editing</span></a></li>
+        <li><a href="/docs/superpowers/chapters/module-2/5-bash" class="chapter-link" data-chapter="2-5"><span class="chapter-number">06</span><span class="chapter-name">Bash commands</span></a></li>
+        <li><a href="/docs/superpowers/chapters/module-2/6-sessions" class="chapter-link" data-chapter="2-6"><span class="chapter-number">07</span><span class="chapter-name">Sessions</span></a></li>
+        <li><a href="/docs/superpowers/chapters/module-2/7-branching" class="chapter-link" data-chapter="2-7"><span class="chapter-number">08</span><span class="chapter-name">Branching & forks</span></a></li>
+      </ul>
+    </div>
+
+    <!-- Module 3: Extending pi -->
+    <div class="module" data-module="3">
+      <button class="module-header" aria-expanded="true" aria-controls="module-3-chapters">
+        <span class="module-arrow">▼</span>
+        <span class="module-number">03</span>
+        <span class="module-title">Extending pi</span>
+      </button>
+      <ul class="chapter-list" id="module-3-chapters">
+        <li><a href="/docs/superpowers/chapters/module-3/8-extensions-intro" class="chapter-link" data-chapter="3-8"><span class="chapter-number">09</span><span class="chapter-name">Extensions intro</span></a></li>
+        <li><a href="/docs/superpowers/chapters/module-3/9-first-tool" class="chapter-link" data-chapter="3-9"><span class="chapter-number">10</span><span class="chapter-name">Your first tool</span></a></li>
+        <li><a href="/docs/superpowers/chapters/module-3/10-commands-events" class="chapter-link" data-chapter="3-10"><span class="chapter-number">11</span><span class="chapter-name">Commands & events</span></a></li>
+        <li><a href="/docs/superpowers/chapters/module-3/11-event-bus-intro" class="chapter-link" data-chapter="3-11"><span class="chapter-number">12</span><span class="chapter-name">Event bus intro</span></a></li>
+      </ul>
+    </div>
+
+    <!-- Advanced Topics (Always Expanded) -->
+    <div class="module module-advanced" data-module="advanced">
+      <button class="module-header" aria-expanded="true" aria-controls="advanced-chapters">
+        <span class="module-arrow">▼</span>
+        <span class="module-title">Advanced Topics</span>
+      </button>
+      <ul class="chapter-list" id="advanced-chapters">
+        <li><a href="/docs/superpowers/chapters/module-a/1-agents-overview" class="chapter-link" data-chapter="a-1"><span class="chapter-number">A1</span><span class="chapter-name">Agent Teams</span></a></li>
+        <li><a href="/docs/superpowers/chapters/module-a/2-single-agent" class="chapter-link" data-chapter="a-2"><span class="chapter-number">A2</span><span class="chapter-name">Agent Teams</span></a></li>
+        <li><a href="/docs/superpowers/chapters/module-b/1-memory-intro" class="chapter-link" data-chapter="b-1"><span class="chapter-number">B1</span><span class="chapter-name">Persistent Memory</span></a></li>
+        <li><a href="/docs/superpowers/chapters/module-c/1-event-bus-deep" class="chapter-link" data-chapter="c-1"><span class="chapter-number">C1</span><span class="chapter-name">Event Bus Deep Dive</span></a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="sidebar-footer">
+    <span class="footer-text">Learn pi from Zero to Hero</span>
+  </div>
+</nav>
+
+<!-- Mobile Header -->
+<header class="mobile-header" id="mobileHeader">
+  <button class="hamburger" id="hamburgerBtn" aria-label="Open menu" aria-expanded="false">
+    <span class="hamburger-icon">☰</span>
+  </button>
+  <span class="mobile-title" id="mobileTitle">Chapter</span>
+  <div class="mobile-nav">
+    <button class="mobile-nav-btn prev" id="prevBtn" aria-label="Previous chapter">◀</button>
+    <button class="mobile-nav-btn next" id="nextBtn" aria-label="Next chapter">▶</button>
+  </div>
+</header>
+
+<!-- Mobile Backdrop -->
+<div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+<style>
+  /* Sidebar Container */
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: var(--sidebar-width);
+    height: 100vh;
+    background-color: var(--bg-deep);
+    border-right: 1px solid var(--border-subtle);
+    display: flex;
+    flex-direction: column;
+    z-index: 100;
+  }
+
+  /* Sidebar Header */
+  .sidebar-header {
+    padding: var(--space-5);
+    border-bottom: 1px solid var(--border-subtle);
+  }
+
+  .sidebar-title {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--accent-primary);
+    text-decoration: none;
+  }
+
+  .sidebar-title:hover {
+    text-decoration: none;
+  }
+
+  .sidebar-logo {
+    font-size: 1.25rem;
+  }
+
+  /* Sidebar Content */
+  .sidebar-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: var(--space-4) 0;
+  }
+
+  /* Module */
+  .module {
+    margin-bottom: var(--space-2);
+  }
+
+  .module-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    width: 100%;
+    padding: var(--space-3) var(--space-5);
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: var(--font-prose);
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: color var(--transition-fast);
+  }
+
+  .module-header:hover {
+    color: var(--text-secondary);
+  }
+
+  .module-arrow {
+    font-size: 0.625rem;
+    transition: transform var(--transition-base);
+    transform: rotate(0deg);
+  }
+
+  .module-header[aria-expanded="false"] .module-arrow {
+    transform: rotate(-90deg);
+  }
+
+  .module-number {
+    opacity: 0.7;
+  }
+
+  .module-title {
+    flex: 1;
+    text-align: left;
+  }
+
+  /* Chapter List */
+  .chapter-list {
+    list-style: none;
+    overflow: hidden;
+    max-height: 0;
+    transition: max-height var(--transition-base);
+  }
+
+  .module-header[aria-expanded="true"] + .chapter-list {
+    max-height: 500px;
+  }
+
+  .chapter-link {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-2) var(--space-5);
+    padding-left: calc(var(--space-5) + 1.5rem);
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    text-decoration: none;
+    border-left: 3px solid transparent;
+    transition: all var(--transition-fast);
+  }
+
+  .chapter-link:hover {
+    background-color: var(--bg-elevated);
+    color: var(--text-primary);
+  }
+
+  .chapter-link.active {
+    background-color: var(--accent-subtle);
+    border-left-color: var(--accent-primary);
+    color: var(--text-primary);
+  }
+
+  .chapter-link.completed .chapter-name::before {
+    content: '✓ ';
+    color: var(--success);
+    font-size: 0.75rem;
+  }
+
+  .chapter-number {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    min-width: 1.5rem;
+  }
+
+  .chapter-name {
+    flex: 1;
+  }
+
+  /* Sidebar Footer */
+  .sidebar-footer {
+    padding: var(--space-4) var(--space-5);
+    border-top: 1px solid var(--border-subtle);
+  }
+
+  .footer-text {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+  }
+
+  /* Mobile Header */
+  .mobile-header {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 56px;
+    background-color: var(--bg-surface);
+    border-bottom: 1px solid var(--border-subtle);
+    padding: 0 var(--space-4);
+    align-items: center;
+    justify-content: space-between;
+    z-index: 99;
+  }
+
+  .hamburger {
+    background: none;
+    border: none;
+    font-size: 1.25rem;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: var(--space-2);
+  }
+
+  .mobile-title {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+  }
+
+  .mobile-nav {
+    display: flex;
+    gap: var(--space-2);
+  }
+
+  .mobile-nav-btn {
+    background: none;
+    border: none;
+    font-size: 1rem;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: var(--space-2);
+  }
+
+  /* Sidebar Backdrop (Mobile) */
+  .sidebar-backdrop {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background-color: rgba(15, 15, 35, 0.8);
+    z-index: 99;
+    opacity: 0;
+    transition: opacity var(--transition-base);
+  }
+
+  .sidebar-backdrop.visible {
+    opacity: 1;
+  }
+
+  /* Mobile Styles */
+  @media (max-width: 767px) {
+    .sidebar {
+      transform: translateX(-100%);
+      transition: transform var(--transition-base);
+      width: 85%;
+      max-width: 320px;
+    }
+
+    .sidebar.open {
+      transform: translateX(0);
+    }
+
+    .sidebar-backdrop {
+      display: block;
+    }
+
+    .mobile-header {
+      display: flex;
+    }
+
+    body.sidebar-open {
+      overflow: hidden;
+    }
+  }
+</style>
+
+<script>
+  // Sidebar interactivity
+  document.addEventListener('DOMContentLoaded', () => {
+    const sidebar = document.getElementById('sidebar');
+    const hamburgerBtn = document.getElementById('hamburgerBtn');
+    const backdrop = document.getElementById('sidebarBackdrop');
+    const moduleHeaders = document.querySelectorAll('.module-header');
+
+    // Toggle sidebar on mobile
+    function openSidebar() {
+      sidebar?.classList.add('open');
+      backdrop?.classList.add('visible');
+      hamburgerBtn?.setAttribute('aria-expanded', 'true');
+      document.body.classList.add('sidebar-open');
+    }
+
+    function closeSidebar() {
+      sidebar?.classList.remove('open');
+      backdrop?.classList.remove('visible');
+      hamburgerBtn?.setAttribute('aria-expanded', 'false');
+      document.body.classList.remove('sidebar-open');
+    }
+
+    hamburgerBtn?.addEventListener('click', () => {
+      if (sidebar?.classList.contains('open')) {
+        closeSidebar();
+      } else {
+        openSidebar();
+      }
+    });
+
+    backdrop?.addEventListener('click', closeSidebar);
+
+    // Module expand/collapse
+    moduleHeaders.forEach(header => {
+      header.addEventListener('click', () => {
+        const expanded = header.getAttribute('aria-expanded') === 'true';
+        header.setAttribute('aria-expanded', expanded ? 'false' : 'true');
+      });
+    });
+
+    // Mark active chapter
+    const currentPath = window.location.pathname;
+    document.querySelectorAll('.chapter-link').forEach(link => {
+      if (link.getAttribute('href') === currentPath) {
+        link.classList.add('active');
+      }
+    });
+
+    // Close sidebar on chapter click (mobile)
+    document.querySelectorAll('.chapter-link').forEach(link => {
+      link.addEventListener('click', () => {
+        closeSidebar();
+      });
+    });
+  });
+</script>

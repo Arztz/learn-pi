@@ -1,0 +1,55 @@
+{
+  "turns": [
+    {
+      "role": "user",
+      "content": "Show me what happens during compaction"
+    },
+    {
+      "role": "assistant",
+      "thinking": "The user wants to understand the compaction process. I should explain what pi does when context gets too large.",
+      "toolCalls": [
+        {
+          "name": "bash",
+          "args": {
+            "command": "pi compact --dry-run"
+          }
+        }
+      ]
+    },
+    {
+      "role": "assistant",
+      "toolResult": {
+        "toolName": "bash",
+        "content": "Compaction analysis:\n\nCurrent session: 45,234 tokens\nThreshold: 40,000 tokens\n\nAnalyzing context...",
+        "isError": false
+      }
+    },
+    {
+      "role": "assistant",
+      "content": "## Pre-Compaction Analysis\n\n**Identified 127 conversation turns**\n\n**Extracting key decisions:**\n- Architecture: Next.js 14 App Router\n- Database: PostgreSQL + Prisma\n- Auth: NextAuth.js with credentials provider\n- Styling: Tailwind CSS\n- State: Zustand for client state\n\n**Extracting facts:**\n- API routes in `src/app/api/`\n- Components in `src/components/`\n- Use 'use client' for interactive components\n- ENV vars in `.env.local`"
+    },
+    {
+      "role": "assistant",
+      "toolCalls": [
+        {
+          "name": "bash",
+          "args": {
+            "command": "pi compact"
+          }
+        }
+      ]
+    },
+    {
+      "role": "assistant",
+      "toolResult": {
+        "toolName": "bash",
+        "content": "Compaction complete!\n\nBefore: 45,234 tokens\nAfter: 2,341 tokens\nSaved: 42,893 tokens (95% reduction)",
+        "isError": false
+      }
+    },
+    {
+      "role": "assistant",
+      "content": "## Compaction Result\n\n```json\n{\n  \"type\": \"compaction\",\n  \"timestamp\": \"2024-03-15T14:30:00Z\",\n  \"summary\": {\n    \"project\": \"my-app\",\n    \"language\": \"TypeScript\",\n    \"framework\": \"Next.js 14\"\n  },\n  \"decisions\": [\n    {\n      \"id\": \"auth-strategy\",\n      \"description\": \"NextAuth.js with credentials\",\n      \"rationale\": \"Simple MVP, extensible\"\n    }\n  ],\n  \"facts\": [\n    \"API in src/app/api/\",\n    \"'use client' for interactive\"\n  ]\n}\n```\n\nAll 127 turns → 1 compaction entry. Context is now manageable!"
+    }
+  ]
+}

@@ -1,0 +1,182 @@
+---
+layout: '../../../src/layouts/ChapterLayout.astro'
+title: "Event bus deep"
+moduleName: "Module C: Event Bus Deep Dive"
+chapterNumber: "C1"
+readingTime: "6 min read"
+description: "Complete reference for the pi.events API and all event types."
+prevChapter:
+  title: "Module B Conclusion"
+  href: "/docs/superpowers/chapters/module-b/3-strategies"
+nextChapter:
+  title: "Pub/sub patterns"
+  href: "/docs/superpowers/chapters/module-c/2-pubsub-patterns"
+---
+
+import Callout from '../../../src/components/Callout.astro';
+
+# Event bus deep
+
+The event bus is pi's internal messaging system for extension-to-extension communication.
+
+## Architecture
+
+```
+┌─────────────┐     ┌─────────────┐
+│ Extension A │     │ Extension B │
+└──────┬──────┘     └──────┬──────┘
+       │                   │
+       │    ┌───────────┐ │
+       └───►│ Event Bus │◄┘
+            └───────────┘
+                   │
+       ┌───────────┴───────────┐
+       ▼                       ▼
+┌─────────────┐         ┌─────────────┐
+│ Extension C │         │    Core     │
+└─────────────┘         └─────────────┘
+```
+
+## pi.events API
+
+### emit(event, data)
+
+Broadcast an event to all listeners.
+
+```typescript
+pi.events.emit('user:login', { userId: '123', timestamp: Date.now() });
+```
+
+**Parameters:**
+| Name | Type | Description |
+|------|------|-------------|
+| event | string | Event name (format: `namespace:action`) |
+| data | any | Event payload |
+
+**Returns:** `void`
+
+### on(event, handler)
+
+Register a persistent listener.
+
+```typescript
+pi.events.on('file:created', (data) => {
+  console.log('File created:', data.path);
+});
+```
+
+**Parameters:**
+| Name | Type | Description |
+|------|------|-------------|
+| event | string | Event name pattern |
+| handler | Function | Callback function |
+
+**Returns:** `Unsubscribe` function
+
+### once(event, handler)
+
+Register a one-time listener.
+
+```typescript
+pi.events.once('session:start', (data) => {
+  console.log('Session started at:', data.timestamp);
+});
+```
+
+**Returns:** `Unsubscribe` function
+
+### off(event, handler)
+
+Remove a specific listener.
+
+```typescript
+const handler = (data) => { /* ... */ };
+pi.events.on('build:complete', handler);
+pi.events.off('build:complete', handler);
+```
+
+## Event Naming Convention
+
+Use `namespace:action` format:
+
+| Pattern | Example | Use Case |
+|---------|---------|----------|
+| `noun:verb` | `file:created` | When something happens |
+| `noun:verb:adj` | `build:complete:success` | With status |
+| `phase:event` | `session:start` | Lifecycle events |
+
+<Callout variant="info" title="Wildcard Support">
+Some event buses support patterns like `file:*` to listen to all file events. Check specific implementation.
+</Callout>
+
+## Built-in Events
+
+pi emits these events automatically:
+
+### Session Events
+
+| Event | Data | Description |
+|-------|------|-------------|
+| `session:start` | `{ sessionId, project }` | New session begins |
+| `session:end` | `{ sessionId, duration }` | Session ends |
+| `session:resume` | `{ sessionId, fromTurn }` | Session resumed |
+
+### Turn Events
+
+| Event | Data | Description |
+|-------|------|-------------|
+| `turn:user` | `{ message }` | User sent message |
+| `turn:assistant` | `{ response }` | Assistant responded |
+| `turn:tool` | `{ tool, input }` | Tool was called |
+| `turn:complete` | `{ turnId }` | Turn finished |
+
+### File Events
+
+| Event | Data | Description |
+|-------|------|-------------|
+| `file:read` | `{ path, size }` | File was read |
+| `file:written` | `{ path }` | File was created/modified |
+| `file:deleted` | `{ path }` | File was deleted |
+
+### Extension Events
+
+| Event | Data | Description |
+|-------|------|-------------|
+| `extension:loaded` | `{ name, version }` | Extension loaded |
+| `extension:error` | `{ name, error }` | Extension threw error |
+
+## Error Handling
+
+Events don't throw—they're fire-and-forget:
+
+```typescript
+// Safe: errors in handlers don't affect emit
+pi.events.emit('user:login', { userId: '123' });
+
+// But always wrap your handlers:
+pi.events.on('file:created', (data) => {
+  try {
+    await processFile(data.path);
+  } catch (error) {
+    console.error('Handler error:', error);
+  }
+});
+```
+
+## Summary
+
+The event bus provides decoupled communication:
+
+- **emit()** broadcasts to all listeners
+- **on()** registers persistent handlers
+- **once()** registers one-time handlers
+- **off()** removes handlers
+- **Built-in events** for common lifecycle moments
+
+Next, we'll see **patterns** for using these effectively.
+
+<div style="text-align: center; margin-top: 2rem;">
+  <a href="/docs/superpowers/chapters/module-c/2-pubsub-patterns" style="display: inline-block; padding: 0.75rem 1.5rem; background: var(--accent-primary); color: white; border-radius: 8px; text-decoration: none; font-weight: 500;">
+    Next: Pub/sub patterns →
+  </a>
+</div>

@@ -1,0 +1,94 @@
+---
+layout: '../../../src/layouts/ChapterLayout.astro'
+title: "Install in 5 minutes"
+moduleName: "Module 1: Getting Started"
+chapterNumber: 2
+readingTime: "5 min read"
+description: "Get pi installed and configured with your first API key."
+prevChapter:
+  title: "What is pi?"
+  href: "/docs/superpowers/chapters/module-1/0-what-is-pi"
+nextChapter:
+  title: "Hello, pi!"
+  href: "/docs/superpowers/chapters/module-1/2-hello-pi"
+---
+
+import Callout from '../../../src/components/Callout.astro';
+
+# Install in 5 minutes
+
+Let's get pi running on your machine. You'll need Node.js 18+ installed.
+
+## Step 1: Install via npm
+
+Open your terminal and run:
+
+```bash
+npm install -g @mariozechner/pi-coding-agent
+```
+
+<Callout variant="tip" title="Using Bun?">
+If you prefer Bun, just run `bun add -g @mariozechner/pi-coding-agent` instead.
+</Callout>
+
+## Step 2: Configure API Key
+
+pi supports multiple providers. The simplest is Anthropic (Claude).
+
+```bash
+# Set your Anthropic API key
+export ANTHROPIC_API_KEY=sk-ant-...
+```
+
+<Callout variant="warning" title="API Key Safety">
+Never commit API keys to git. Add `ANTHROPIC_API_KEY` to your shell profile (~/.bashrc, ~/.zshrc) or use a `.env` file with your projects.
+</Callout>
+
+## Step 3: Launch pi
+
+```bash
+pi
+```
+
+You should see the startup header showing loaded extensions, skills, and your current configuration.
+
+## Alternative: Use /login
+
+If you have a subscription (Claude Pro/Max, ChatGPT Plus, etc.), you can use the built-in OAuth:
+
+```bash
+pi
+/login   # Opens provider selection
+```
+
+Select your provider and authenticate in your browser.
+
+## Verify Installation
+
+Let's confirm everything works:
+
+```bash
+pi --version
+```
+
+This should output the current pi version.
+
+## Quick Test
+
+Run this non-interactive command to verify pi can communicate with the model:
+
+```bash
+pi -p "Say hello in one sentence"
+```
+
+If you see a response, you're all set!
+
+## What's Next?
+
+Now that pi is installed, let's send our first prompt and see how pi responds with tool calls.
+
+<div style="text-align: center; margin-top: 2rem;">
+  <a href="/docs/superpowers/chapters/module-1/2-hello-pi" style="display: inline-block; padding: 0.75rem 1.5rem; background: var(--accent-primary); color: white; border-radius: 8px; text-decoration: none; font-weight: 500;">
+    Next: Hello, pi! →
+  </a>
+</div>

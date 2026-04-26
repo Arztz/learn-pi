@@ -1,0 +1,106 @@
+---
+layout: '../../../src/layouts/ChapterLayout.astro'
+title: "Extensions intro"
+moduleName: "Module 3: Extending pi"
+chapterNumber: 9
+readingTime: "8 min read"
+description: "Understand what extensions are and how they extend pi's capabilities."
+prevChapter:
+  title: "Branching & forks"
+  href: "/docs/superpowers/chapters/module-2/7-branching"
+nextChapter:
+  title: "Your first tool"
+  href: "/docs/superpowers/chapters/module-3/9-first-tool"
+---
+
+import Callout from '../../../src/components/Callout.astro';
+import InteractiveDiagram from '../../../src/components/InteractiveDiagram.astro';
+
+# Extensions intro
+
+Extensions are TypeScript modules that add new capabilities to pi — custom tools, commands, event handlers, and UI components.
+
+## What Extensions Can Do
+
+| Capability | Description | Example |
+|------------|-------------|---------|
+| **Custom Tools** | Add LLM-callable tools | `deploy`, `query-db` |
+| **Commands** | Slash commands like `/deploy` | `/hello`, `/stats` |
+| **Event Handlers** | React to tool calls, messages | Auto-commit on each turn |
+| **UI Components** | Custom overlays, status lines | Doom game overlay |
+| **Permission Gates** | Confirm destructive actions | Block `rm -rf /` |
+
+## Extension Locations
+
+| Location | Scope |
+|----------|-------|
+| `~/.pi/agent/extensions/` | Global (all projects) |
+| `.pi/extensions/` | Project-local |
+
+Drop a `.ts` file in one of these directories and pi auto-loads it on startup.
+
+## Anatomy of an Extension
+
+```typescript
+import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
+
+export default function (pi: ExtensionAPI) {
+  // Register a tool
+  pi.registerTool({ name: "my-tool", ... });
+
+  // Register a command
+  pi.registerCommand("hello", { description: "...", handler: ... });
+
+  // Listen to events
+  pi.on("tool_call", async (event, ctx) => {
+    console.log(`Tool ${event.toolName} was called`);
+  });
+}
+```
+
+## Lifecycle
+
+<InteractiveDiagram
+  type="d3"
+  config={JSON.stringify({
+    nodes: [
+      { id: 'load', label: 'Extension Load', level: 0 },
+      { id: 'init', label: 'Init (async)', level: 1 },
+      { id: 'register', label: 'Register Tools/Commands', level: 2 },
+      { id: 'events', label: 'Event Listeners Active', level: 3 },
+      { id: 'session', label: 'Session Start', level: 4 }
+    ],
+    links: [
+      { from: 'load', to: 'init' },
+      { from: 'init', to: 'register' },
+      { from: 'register', to: 'events' },
+      { from: 'events', to: 'session' }
+    ]
+  })}
+  title="Extension Lifecycle"
+/>
+
+<Callout variant="info" title="Async Factories">
+If your extension needs async setup (fetching remote config, querying a database), return a Promise from the default function. pi waits for it before continuing startup.
+</Callout>
+
+## Loading Extensions
+
+Extensions load in this order:
+
+1. Global extensions (`~/.pi/agent/extensions/`)
+2. Project extensions (`.pi/extensions/`)
+3. Settings.json extension paths
+4. Command-line `--extension` flags
+
+Use `/reload` to hot-reload extensions without restarting pi.
+
+## What's Next?
+
+Next chapter: Build your first custom tool!
+
+<div style="text-align: center; margin-top: 2rem;">
+  <a href="/docs/superpowers/chapters/module-3/9-first-tool" style="display: inline-block; padding: 0.75rem 1.5rem; background: var(--accent-primary); color: white; border-radius: 8px; text-decoration: none; font-weight: 500;">
+    Next: Your first tool →
+  </a>
+</div>

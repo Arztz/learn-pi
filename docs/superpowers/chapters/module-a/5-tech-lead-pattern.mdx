@@ -1,0 +1,188 @@
+---
+layout: '../../../src/layouts/ChapterLayout.astro'
+title: "Tech lead pattern"
+moduleName: "Module A: Agent Teams"
+chapterNumber: "A5"
+readingTime: "12 min read"
+description: "Hierarchical team structure with Orchestrator, Tech Lead, Dev Leads, and parallel Dev Seniors."
+prevChapter:
+  title: "Chain workflow"
+  href: "/docs/superpowers/chapters/module-a/4-chain-workflow"
+nextChapter:
+  title: "Comparing results"
+  href: "/docs/superpowers/chapters/module-a/6-comparing-results"
+---
+
+import Callout from '../../../src/components/Callout.astro';
+import InteractiveDiagram from '../../../src/components/InteractiveDiagram.astro';
+
+# Tech lead pattern
+
+Hierarchical multi-agent architecture for complex, large-scale development tasks.
+
+## Architecture
+
+The tech lead pattern uses a **4-tier hierarchy**:
+
+```
+┌─────────────┐
+│ Orchestrator │  ← You interact with this
+└──────┬──────┘
+       │
+       ▼
+┌─────────────┐
+│  Tech Lead  │  ← Coordinates multiple workstreams
+└──────┬──────┘
+       │
+       ▼
+┌─────────────┐
+│  Dev Lead A │     ┌─────────────┐
+└──────┬──────┘     │  Dev Lead B │
+       │            └──────┬──────┘
+       ▼                 ▼
+┌─────────────┐     ┌─────────────┐
+│ Dev Senior A│     │ Dev Senior B│
+└─────────────┘     └─────────────┘
+```
+
+## Agent Definitions
+
+### Orchestrator
+
+The orchestrator is you—the human. You direct the overall effort:
+
+```json
+{
+  "name": "orchestrator",
+  "description": "You are the orchestrator. Direct the team toward the goal.",
+  "llm": "claude-sonnet-4-20250514"
+}
+```
+
+### Tech Lead
+
+The tech lead analyzes requirements and coordinates parallel workstreams:
+
+```json
+{
+  "name": "tech-lead",
+  "description": "Senior architect. Coordinates Dev Leads, reviews architecture.",
+  "llm": "claude-sonnet-4-20250514",
+  "tools": ["read", "edit", "bash"],
+  "promptTemplate": "You are a tech lead. Break down {task} into parallel workstreams."
+}
+```
+
+### Dev Lead
+
+Dev leads own a workstream and delegate to senior developers:
+
+```json
+{
+  "name": "dev-lead-a",
+  "description": "Dev Lead for frontend workstream.",
+  "llm": "claude-sonnet-4-20250514",
+  "promptTemplate": "You lead the frontend workstream. Delegate to Dev Senior A."
+}
+```
+
+### Dev Senior
+
+Senior developers implement specific features:
+
+```json
+{
+  "name": "dev-senior-a",
+  "description": "Senior frontend developer. Implements features in workstream A.",
+  "llm": "claude-opus-4-20250514",
+  "tools": ["read", "edit", "bash", "write"]
+}
+```
+
+## Workflow Example
+
+```
+Build a full-stack e-commerce checkout flow
+```
+
+**Step 1:** Orchestrator (you) assigns task to Tech Lead
+
+**Step 2:** Tech Lead breaks into workstreams:
+- Workstream A: Frontend checkout UI
+- Workstream B: Backend checkout API
+
+**Step 3:** Dev Leads coordinate:
+- Dev Lead A → Dev Senior A (React components)
+- Dev Lead B → Dev Senior B (Express endpoints)
+
+**Step 4:** Results flow back up the hierarchy
+
+## Interactive Diagram
+
+<InteractiveDiagram
+  type="d3"
+  title="Tech Lead Team Hierarchy"
+  config={JSON.stringify({
+    nodes: [
+      { id: "orchestrator", label: "You (Orchestrator)", type: "human" },
+      { id: "tech-lead", label: "Tech Lead", type: "techlead" },
+      { id: "dev-lead-a", label: "Dev Lead A", type: "devlead" },
+      { id: "dev-lead-b", label: "Dev Lead B", type: "devlead" },
+      { id: "dev-senior-a", label: "Dev Senior A", type: "devsenior" },
+      { id: "dev-senior-b", label: "Dev Senior B", type: "devsenior" }
+    ],
+    links: [
+      { from: "orchestrator", to: "tech-lead" },
+      { from: "tech-lead", to: "dev-lead-a" },
+      { from: "tech-lead", to: "dev-lead-b" },
+      { from: "dev-lead-a", to: "dev-senior-a" },
+      { from: "dev-lead-b", to: "dev-senior-b" }
+    ]
+  })}
+/>
+
+## Configuration
+
+Enable the tech lead pattern in your subagent config:
+
+```json
+{
+  "subagent": {
+    "defaultMode": "chain",
+    "hierarchy": {
+      "orchestrator": "tech-lead",
+      "tech-lead": ["dev-lead-a", "dev-lead-b"],
+      "dev-lead-a": "dev-senior-a",
+      "dev-lead-b": "dev-senior-b"
+    }
+  }
+}
+```
+
+<Callout variant="info" title="When to Use">
+The tech lead pattern shines for **large, complex tasks** that need:
+- Multiple workstreams running in parallel
+- Architecture-level coordination
+- Different specialized skills (frontend/backend/fullstack)
+
+For simpler tasks, prefer single or parallel agents.
+</Callout>
+
+## Benefits
+
+| Benefit | Description |
+|---------|-------------|
+| **Parallel execution** | Multiple workstreams run simultaneously |
+| **Clear ownership** | Each workstream has a dedicated lead |
+| **Scalable** | Add more Dev Leads/Seniors as needed |
+| **Hierarchical review** | Tech Lead ensures architectural consistency |
+
+<Callout variant="tip" title="Start Simple">
+Don't jump to the full tech lead pattern. Start with single/parallel agents, then scale up when you need coordination.
+</Callout>
+
+<div style="text-align: center; margin-top: 2rem;">
+  <a href="/docs/superpowers/chapters/module-a/6-comparing-results" style="display: inline-block; padding: 0.75rem 1.5rem; background: var(--accent-primary); color: white; border-radius: 8px; text-decoration: none; font-weight: 500;">
+    Next: Comparing results →
+  </a>
+</div>

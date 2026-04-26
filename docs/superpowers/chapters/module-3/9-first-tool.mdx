@@ -1,0 +1,100 @@
+---
+layout: '../../../src/layouts/ChapterLayout.astro'
+title: "Your first tool"
+moduleName: "Module 3: Extending pi"
+chapterNumber: 10
+readingTime: "10 min read"
+description: "Build a custom tool with defineTool and register it with pi."
+prevChapter:
+  title: "Extensions intro"
+  href: "/docs/superpowers/chapters/module-3/8-extensions-intro"
+nextChapter:
+  title: "Commands & events"
+  href: "/docs/superpowers/chapters/module-3/10-commands-events"
+---
+
+import Callout from '../../../src/components/Callout.astro';
+
+# Your first tool
+
+Let's build a simple extension that adds a custom `greet` tool.
+
+## Create the Extension File
+
+Create `~/.pi/agent/extensions/my-greeting.ts`:
+
+```typescript
+import { Type } from "@mariozechner/pi-ai";
+import { defineTool, type ExtensionAPI } from "@mariozechner/pi-coding-agent";
+
+export default function (pi: ExtensionAPI) {
+  // Define the greet tool
+  const greetTool = defineTool({
+    name: "greet",
+    label: "Greet",
+    description: "A simple greeting tool",
+    parameters: Type.Object({
+      name: Type.String({ description: "Name to greet" }),
+    }),
+
+    async execute(_toolCallId, params, _signal, _onUpdate, _ctx) {
+      return {
+        content: [{ type: "text", text: `Hello, ${params.name}!` }],
+        details: { greeted: params.name },
+      };
+    },
+  });
+
+  // Register it
+  pi.registerTool(greetTool);
+}
+```
+
+## How defineTool Works
+
+| Property | Purpose |
+|----------|---------|
+| `name` | Tool identifier for the LLM |
+| `label` | Display name in TUI |
+| `description` | Help text for the LLM |
+| `parameters` | TypeScript schema (TypeBox) |
+| `execute` | The actual implementation |
+
+## The Parameters Schema
+
+Uses [TypeBox](https://github.com/sinclairzx81/typebox) for TypeScript-first schemas:
+
+```typescript
+Type.Object({
+  name: Type.String({ description: "Name to greet" }),
+  age: Type.Optional(Type.Number()),
+  tags: Type.Array(Type.String()),
+})
+```
+
+## Testing Your Tool
+
+1. Save the file
+2. Run `/reload` in pi (or restart pi)
+3. Ask: `"Use the greet tool to say hello to Alice"`
+
+pi will call your tool and display the result!
+
+<Callout variant="tip" title="Debugging">
+Check the startup header — it shows loaded extensions. If yours doesn't appear, check for syntax errors in the file.
+</Callout>
+
+## Summary
+
+You learned:
+
+- ✓ Create an extension file in `~/.pi/agent/extensions/`
+- ✓ Use `defineTool` to create a tool definition
+- ✓ Register tools with `pi.registerTool()`
+- ✓ Parameters use TypeBox schemas
+
+<div style="text-align: center; margin-top: 2rem;">
+  <a href="/docs/superpowers/chapters/module-3/10-commands-events" style="display: inline-block; padding: 0.75rem 1.5rem; background: var(--accent-primary); color: white; border-radius: 8px; text-decoration: none; font-weight: 500;">
+    Next: Commands & events →
+  </a>
+</div>

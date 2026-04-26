@@ -1,0 +1,82 @@
+---
+layout: '../../../src/layouts/ChapterLayout.astro'
+title: "Single agent"
+moduleName: "Module A: Agent Teams"
+chapterNumber: "A2"
+readingTime: "7 min read"
+description: "Invoke a single subagent to handle a task."
+prevChapter:
+  title: "Agents overview"
+  href: "/docs/superpowers/chapters/module-a/1-agents-overview"
+nextChapter:
+  title: "Parallel agents"
+  href: "/docs/superpowers/chapters/module-a/3-parallel-agents"
+---
+
+import Callout from '../../../src/components/Callout.astro';
+
+# Single agent
+
+Use the `subagent` tool to delegate a task to one agent.
+
+## Syntax
+
+```json
+{
+  "agent": "scout",
+  "task": "Find all authentication-related files in the project"
+}
+```
+
+## How It Works
+
+1. The subagent tool loads the agent definition (system prompt, tools, model)
+2. Spawns a separate `pi` process with the task
+3. Runs in JSON mode for clean output
+4. Returns the final message(s) and usage stats
+
+<Callout variant="info" title="Isolated Context">
+Each subagent runs in its own process with a fresh context. It doesn't share your current session's history.
+</Callout>
+
+## Example
+
+In pi, type:
+
+```
+Use the scout agent to find all files related to authentication
+```
+
+pi will invoke the subagent tool with that task and show the results.
+
+## Output Display
+
+The subagent tool renders results nicely:
+
+```
+✓ scout (user)
+   Found 3 authentication-related files:
+   - src/auth/login.ts
+   - src/auth/session.ts
+   - src/auth/middleware.ts
+
+   ↑1.2k ↓856 R128 W64 $0.0021 ctx:8,234 claude-haiku-4-5
+```
+
+## Tool Parameters
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `agent` | string | Agent name to invoke |
+| `task` | string | Task description |
+| `cwd` | string (opt) | Working directory override |
+
+## Next: Parallel Execution
+
+Next chapter: Run multiple agents simultaneously.
+
+<div style="text-align: center; margin-top: 2rem;">
+  <a href="/docs/superpowers/chapters/module-a/3-parallel-agents" style="display: inline-block; padding: 0.75rem 1.5rem; background: var(--accent-primary); color: white; border-radius: 8px; text-decoration: none; font-weight: 500;">
+    Next: Parallel agents →
+  </a>
+</div>

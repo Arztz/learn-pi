@@ -1,0 +1,317 @@
+---
+// Animated Sequence Component - Step-by-step animations
+
+interface Props {
+  type?: 'css' | 'lottie';
+  steps?: string;
+  title?: string;
+}
+
+const { type = 'css', steps = '[]', title = 'Animation' } = Astro.props;
+---
+
+<div class="animated-sequence" data-type={type} data-steps={steps} data-title={title}>
+  <div class="sequence-container" id="sequenceContainer">
+    <!-- Animation content renders here -->
+  </div>
+
+  <div class="sequence-controls">
+    <button class="ctrl-btn play-btn" aria-label="Play">
+      <span class="icon">▶</span>
+    </button>
+    <button class="ctrl-btn replay-btn" aria-label="Replay">
+      <span class="icon">↺</span>
+    </button>
+    <div class="step-indicator">
+      <span class="step-dots" id="stepDots"></span>
+      <span class="step-counter" id="stepCounter">1 / 5</span>
+    </div>
+    <div class="speed-control">
+      <label for="speedSelect">Speed:</label>
+      <select id="speedSelect" class="speed-select">
+        <option value="0.5">0.5x</option>
+        <option value="1" selected>1x</option>
+        <option value="2">2x</option>
+      </select>
+    </div>
+  </div>
+</div>
+
+<style>
+  .animated-sequence {
+    margin: var(--space-5) 0;
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+  }
+
+  .sequence-container {
+    min-height: 200px;
+    padding: var(--space-6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* CSS Animation Styles */
+  :global(.animation-step) {
+    animation: fadeIn 0.4s ease;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  :global(.animation-node) {
+    background-color: var(--bg-elevated);
+    border: 2px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    padding: var(--space-4) var(--space-5);
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+  }
+
+  :global(.animation-node.active) {
+    border-color: var(--accent-primary);
+    box-shadow: var(--shadow-glow);
+    transform: scale(1.02);
+  }
+
+  :global(.animation-node.success) {
+    border-color: var(--success);
+    background-color: var(--success-subtle);
+  }
+
+  :global(.animation-arrow) {
+    color: var(--text-muted);
+    font-size: 1.5rem;
+    margin: var(--space-3) 0;
+    animation: pulse 1s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; }
+  }
+
+  /* Sequence Controls */
+  .sequence-controls {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-4);
+    background-color: var(--bg-elevated);
+    border-top: 1px solid var(--border-subtle);
+  }
+
+  .ctrl-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+  }
+
+  .ctrl-btn:hover:not(:disabled) {
+    background-color: var(--bg-elevated);
+    color: var(--text-primary);
+  }
+
+  .ctrl-btn.play-btn:hover {
+    background-color: var(--accent-primary);
+    border-color: var(--accent-primary);
+    color: white;
+  }
+
+  .ctrl-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  .step-indicator {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    flex: 1;
+    justify-content: center;
+  }
+
+  .step-dots {
+    display: flex;
+    gap: var(--space-2);
+  }
+
+  :global(.step-dot) {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: var(--border-subtle);
+    transition: all var(--transition-fast);
+  }
+
+  :global(.step-dot.active) {
+    background-color: var(--accent-primary);
+    transform: scale(1.2);
+  }
+
+  :global(.step-dot.completed) {
+    background-color: var(--success);
+  }
+
+  .step-counter {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    min-width: 40px;
+  }
+
+  .speed-control {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: 0.75rem;
+    color: var(--text-muted);
+  }
+
+  .speed-select {
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-sm);
+    padding: var(--space-1) var(--space-2);
+    color: var(--text-primary);
+    font-size: 0.75rem;
+    cursor: pointer;
+  }
+
+  .speed-select:focus {
+    outline: none;
+    border-color: var(--accent-primary);
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const sequences = document.querySelectorAll('.animated-sequence');
+
+    sequences.forEach(seq => {
+      const container = seq.querySelector('#sequenceContainer');
+      const stepDots = seq.querySelector('#stepDots');
+      const stepCounter = seq.querySelector('#stepCounter');
+      const playBtn = seq.querySelector('.play-btn');
+      const replayBtn = seq.querySelector('.replay-btn');
+      const speedSelect = seq.querySelector('#speedSelect');
+
+      // Parse steps from data attribute
+      let steps = [];
+      try {
+        steps = JSON.parse(seq.dataset.steps || '[]');
+      } catch (e) {
+        console.error('Failed to parse animation steps:', e);
+        return;
+      }
+
+      let currentStep = 0;
+      let isPlaying = false;
+      let speed = 1;
+      let timeoutId = null;
+
+      // Render step dots
+      if (stepDots && steps.length) {
+        stepDots.innerHTML = steps.map((_, i) =>
+          `<span class="step-dot${i === 0 ? ' active' : ''}" data-step="${i}"></span>`
+        ).join('');
+      }
+
+      function renderStep(index) {
+        if (!container || index >= steps.length) return;
+
+        const step = steps[index];
+        container.innerHTML = `<div class="animation-step">${step.content || ''}</div>`;
+        container.style.opacity = '1';
+
+        // Update dots
+        if (stepDots) {
+          stepDots.querySelectorAll('.step-dot').forEach((dot, i) => {
+            dot.classList.toggle('active', i === index);
+            dot.classList.toggle('completed', i < index);
+          });
+        }
+
+        // Update counter
+        if (stepCounter) {
+          stepCounter.textContent = `${index + 1} / ${steps.length}`;
+        }
+      }
+
+      function play() {
+        if (currentStep >= steps.length) {
+          currentStep = 0;
+        }
+        isPlaying = true;
+        playBtn.querySelector('.icon').textContent = '⏸';
+        playNext();
+      }
+
+      function pause() {
+        isPlaying = false;
+        playBtn.querySelector('.icon').textContent = '▶';
+        if (timeoutId) clearTimeout(timeoutId);
+      }
+
+      function playNext() {
+        if (!isPlaying || currentStep >= steps.length) {
+          isPlaying = false;
+          playBtn.querySelector('.icon').textContent = '▶';
+          return;
+        }
+
+        renderStep(currentStep);
+        currentStep++;
+
+        const step = steps[currentStep - 1];
+        const duration = (step?.duration || 1000) / speed;
+
+        timeoutId = setTimeout(playNext, duration);
+      }
+
+      function reset() {
+        pause();
+        currentStep = 0;
+        renderStep(0);
+      }
+
+      function step() {
+        pause();
+        if (currentStep < steps.length) {
+          renderStep(currentStep);
+          currentStep++;
+        }
+      }
+
+      // Event listeners
+      playBtn?.addEventListener('click', () => {
+        if (isPlaying) pause();
+        else play();
+      });
+
+      replayBtn?.addEventListener('click', reset);
+
+      speedSelect?.addEventListener('change', (e) => {
+        speed = parseFloat(e.target.value);
+      });
+
+      // Initialize with first step
+      if (steps.length) {
+        renderStep(0);
+      }
+    });
+  });
+</script>

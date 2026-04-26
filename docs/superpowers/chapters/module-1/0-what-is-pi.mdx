@@ -1,0 +1,130 @@
+---
+layout: '../../src/layouts/ChapterLayout.astro'
+title: "What is pi?"
+moduleName: "Module 1: Getting Started"
+chapterNumber: 1
+readingTime: "5 min read"
+description: "Understand what pi is, how it differs from other coding assistants, and when to use it."
+prevChapter:
+  title: "Introduction"
+  href: "/docs/superpowers/"
+nextChapter:
+  title: "Install in 5 minutes"
+  href: "/docs/superpowers/chapters/module-1/1-install"
+---
+
+import Callout from '../../src/components/Callout.astro';
+
+# What is pi?
+
+pi is a **terminal coding harness** — a lightweight, extensible CLI tool that lets an LLM operate on your codebase through file operations and bash commands.
+
+<Callout variant="info" title="What is a coding harness?">
+Think of pi as a bridge between you and an AI model. It provides tools (read, write, bash) and manages sessions so the AI can help you code effectively.
+</Callout>
+
+## The Philosophy
+
+pi follows a **minimal core, infinite extensibility** philosophy:
+
+- **No baked-in features** — Subagents, plan mode, permission popups are not built-in. Instead, you extend pi with TypeScript extensions.
+- **Your workflow, not pi's** — pi adapts to how you work, not the other way around.
+- **Share via npm or git** — Bundle extensions, skills, and themes into pi packages anyone can install.
+
+## How pi Compares
+
+| Tool | Approach | Extensibility | Session Management |
+|------|----------|---------------|-------------------|
+| **pi** | Minimal harness | Extensions (TypeScript) | Built-in tree sessions |
+| **Cursor** | IDE with AI | Claude Code mode | Limited |
+| **Gemini CLI** | Cloud-first CLI | MCP support | Basic |
+| **Copilot** | Editor plugin | VSCode settings | None |
+
+<Callout variant="tip" title="When to choose pi">
+pi excels when you:
+- Want **full control** over your coding agent
+- Need **persistent sessions** with branching history
+- Want to **extend** the agent with custom tools
+- Prefer **terminal-based** workflow
+</Callout>
+
+## Core Concepts
+
+### 1. Tools
+pi gives the LLM four built-in tools:
+- **read** — Read file contents
+- **write** — Create new files
+- **edit** — Modify existing files
+- **bash** — Execute shell commands
+
+### 2. Sessions
+Your conversations are saved as JSONL files with a **tree structure**. This means:
+- You can **branch** to try different approaches
+- You can **resume** any previous point
+- History is preserved even after compaction
+
+### 3. Extensions
+TypeScript modules that add:
+- Custom tools and commands
+- Event handlers (before/after tool calls)
+- Custom UI components
+- Integration with external services
+
+### 4. Skills
+Markdown files with agent instructions — like "how to review code" or "how to write tests."
+
+## Architecture Overview
+
+```typescript
+┌─────────────────────────────────────────────────────────────┐
+│                         pi CLI                               │
+├─────────────────────────────────────────────────────────────┤
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐           │
+│  │ Interactive │  │   Print    │  │    RPC     │           │
+│  │   Mode     │  │   Mode     │  │   Mode     │           │
+│  └──────┬──────┘  └──────┬──────┘  └──────┬──────┘           │
+│         │                │                │                 │
+│  ┌──────┴────────────────┴────────────────┴──────┐           │
+│  │              Agent Session                   │           │
+│  │  ┌──────────┐  ┌──────────┐  ┌──────────┐   │           │
+│  │  │  Tools  │  │ Events  │  │ Session  │   │           │
+│  │  │         │  │         │  │ Manager  │   │           │
+│  │  └──────────┘  └──────────┘  └──────────┘   │           │
+│  └─────────────────────────────────────────────┘           │
+│  ┌─────────────────────────────────────────────┐           │
+│  │              Extensions Loader                 │           │
+│  └─────────────────────────────────────────────┘           │
+└─────────────────────────────────────────────────────────────┘
+```
+
+## Your First Interaction
+
+Here's what a typical pi interaction looks like:
+
+```
+> List all TypeScript files in src/
+
+◐ Thinking...
+  The user wants to find TypeScript files. I'll use the `find` tool
+  with the pattern "*.ts" in the src/ directory.
+
+ℹ find { pattern: "*.ts", path: "src/" }
+
+✓ Tool: find
+   src/components/Button.ts
+   src/components/Input.ts
+   src/utils/helpers.ts
+   src/index.ts
+
+Found 4 TypeScript files in src/.
+```
+
+## What's Next?
+
+In the next chapter, you'll install pi and run your first prompt. Let's go!
+
+<div style="text-align: center; margin-top: 2rem;">
+  <a href="/docs/superpowers/chapters/module-1/1-install" style="display: inline-block; padding: 0.75rem 1.5rem; background: var(--accent-primary); color: white; border-radius: 8px; text-decoration: none; font-weight: 500;">
+    Next: Install in 5 minutes →
+  </a>
+</div>

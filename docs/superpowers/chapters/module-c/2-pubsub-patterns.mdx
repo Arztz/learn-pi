@@ -1,0 +1,241 @@
+---
+layout: '../../../src/layouts/ChapterLayout.astro'
+title: "Pub/sub patterns"
+moduleName: "Module C: Event Bus Deep Dive"
+chapterNumber: "C2"
+readingTime: "8 min read"
+description: "Practical patterns for extension communication using publish/subscribe."
+prevChapter:
+  title: "Event bus deep"
+  href: "/docs/superpowers/chapters/module-c/1-event-bus-deep"
+nextChapter:
+  title: "Real-time coordination"
+  href: "/docs/superpowers/chapters/module-c/3-real-time"
+---
+
+import Callout from '../../../src/components/Callout.astro';
+import InteractiveDiagram from '../../../src/components/InteractiveDiagram.astro';
+import CodeSimulator from '../../../src/components/CodeSimulator.astro';
+
+# Pub/sub patterns
+
+Real-world patterns for extension communication using the event bus.
+
+## Request/Response Pattern
+
+Use events for async request/response when direct calls aren't possible:
+
+```typescript
+// Extension A: Service provider
+pi.events.on('git:clone', async (data) => {
+  const { url, path } = data;
+  const result = await git.clone(url, path);
+  pi.events.emit('git:clone:result', { requestId: data.requestId, result });
+});
+```
+
+```typescript
+// Extension B: Service consumer
+const cloneRepo = (url: string, path: string) => {
+  const requestId = Math.random().toString(36);
+  pi.events.emit('git:clone', { url, path, requestId });
+
+  return new Promise((resolve) => {
+    pi.events.once('git:clone:result', (data) => {
+      if (data.requestId === requestId) resolve(data.result);
+    });
+  });
+};
+```
+
+## Event Diagram
+
+<InteractiveDiagram
+  type="d3"
+  title="Event Bus Topology"
+  config={JSON.stringify({
+    nodes: [
+      { id: "extension-a", label: "Extension A (git)", level: 0 },
+      { id: "event-bus", label: "Event Bus", level: 1 },
+      { id: "extension-b", label: "Extension B (你的工具)", level: 2 }
+    ],
+    links: [
+      { from: "extension-a", to: "event-bus" },
+      { from: "event-bus", to: "extension-b" }
+    ]
+  })}
+/>
+
+## Observer Pattern
+
+Track state changes across extensions:
+
+```typescript
+// Central state manager
+const buildState = {
+  status: 'idle',
+  progress: 0,
+  errors: []
+};
+
+pi.events.on('build:start', () => {
+  buildState.status = 'building';
+  buildState.progress = 0;
+  pi.events.emit('build:stateChanged', { ...buildState });
+});
+
+pi.events.on('build:progress', ({ progress }) => {
+  buildState.progress = progress;
+  pi.events.emit('build:stateChanged', { ...buildState });
+});
+
+pi.events.on('build:complete', () => {
+  buildState.status = 'complete';
+  buildState.progress = 100;
+  pi.events.emit('build:stateChanged', { ...buildState });
+});
+```
+
+```typescript
+// UI extension observing
+pi.events.on('build:stateChanged', (state) => {
+  updateBuildIndicator(state);
+});
+```
+
+<Callout variant="tip" title="Decoupled UI">
+The UI doesn't need to know who triggered the build—it just reacts to state changes. This is the observer pattern in action.
+</Callout>
+
+## Broadcast Pattern
+
+Notify multiple extensions without caring who listens:
+
+```typescript
+// When user authenticates
+pi.events.emit('auth:loggedIn', {
+  user: currentUser,
+  timestamp: Date.now(),
+  sessionToken: token
+});
+
+// Extensions react independently:
+// - UI extension: show user avatar
+// - Analytics extension: track login event
+// - Notification extension: send welcome email
+// - Audit extension: log authentication
+```
+
+## Chain Pattern
+
+Extensions process events in sequence:
+
+```typescript
+// Each extension adds something to the pipeline
+pi.events.on('file:created', async (data) => {
+  // 1. Linter checks syntax
+  const lintResult = await linter.check(data.path);
+  pi.events.emit('file:processed', { ...data, lintResult });
+});
+
+pi.events.on('file:processed', async (data) => {
+  // 2. Type checker validates
+  const typeResult = await typeChecker.check(data.path);
+  pi.events.emit('file:validated', { ...data, lintResult, typeResult });
+});
+
+pi.events.on('file:validated', async (data) => {
+  // 3. Formatter standardizes
+  await formatter.format(data.path);
+  pi.events.emit('file:finalized', data);
+});
+```
+
+## Unsubscribe Pattern
+
+Always clean up listeners:
+
+```typescript
+// Good: Store unsubscribe function
+const unsubscribe = pi.events.on('session:end', handler);
+
+// Later, when done:
+unsubscribe();
+
+// Good: Use once for single-use handlers
+pi.events.once('build:complete', () => {
+  showNotification('Build finished!');
+});
+
+// Good: Name your handlers for targeted removal
+const handleFileChange = (data) => { /* ... */ };
+pi.events.on('file:changed', handleFileChange);
+pi.events.off('file:changed', handleFileChange);
+```
+
+<Callout variant="warning" title="Memory Leaks">
+Never forget to unsubscribe! Event listeners hold references and prevent garbage collection.
+</Callout>
+
+## Example: Progress Reporter
+
+Complete extension demonstrating multiple patterns:
+
+```typescript
+export const progressReporter = {
+  name: 'progress-reporter',
+  version: '1.0.0',
+
+  handlers: [],
+
+  register() {
+    // Track all async operations
+    this.handlers.push(
+      pi.events.on('task:start', this.onTaskStart.bind(this)),
+      pi.events.on('task:progress', this.onTaskProgress.bind(this)),
+      pi.events.on('task:complete', this.onTaskComplete.bind(this)),
+      pi.events.on('task:error', this.onTaskError.bind(this))
+    );
+  },
+
+  unregister() {
+    // Clean up all listeners
+    this.handlers.forEach(unsub => unsub());
+    this.handlers = [];
+  },
+
+  onTaskStart(data) {
+    console.log(`[${data.taskId}] Started: ${data.description}`);
+  },
+
+  onTaskProgress(data) {
+    console.log(`[${data.taskId}] ${data.progress}% complete`);
+  },
+
+  onTaskComplete(data) {
+    console.log(`[${data.taskId}] Completed in ${data.duration}ms`);
+  },
+
+  onTaskError(data) {
+    console.error(`[${data.taskId}] Failed: ${data.error}`);
+  }
+};
+```
+
+## Summary
+
+Key patterns for event bus:
+
+| Pattern | Use Case |
+|---------|----------|
+| Request/Response | When you need a response |
+| Observer | UI updates based on state |
+| Broadcast | Notify without coupling |
+| Chain | Sequential processing |
+| Unsubscribe | Prevent memory leaks |
+
+<div style="text-align: center; margin-top: 2rem;">
+  <a href="/docs/superpowers/chapters/module-c/3-real-time" style="display: inline-block; padding: 0.75rem 1.5rem; background: var(--accent-primary); color: white; border-radius: 8px; text-decoration: none; font-weight: 500;">
+    Next: Real-time coordination →
+  </a>
+</div>

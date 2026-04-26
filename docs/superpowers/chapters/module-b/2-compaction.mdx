@@ -1,0 +1,164 @@
+---
+layout: '../../../src/layouts/ChapterLayout.astro'
+title: "Compaction"
+moduleName: "Module B: Persistent Memory"
+chapterNumber: "B2"
+readingTime: "8 min read"
+description: "How pi automatically compresses conversation history to stay within context limits."
+prevChapter:
+  title: "Memory intro"
+  href: "/docs/superpowers/chapters/module-b/1-memory-intro"
+nextChapter:
+  title: "Strategies"
+  href: "/docs/superpowers/chapters/module-b/3-strategies"
+---
+
+import Callout from '../../../src/components/Callout.astro';
+import AnimatedSequence from '../../../src/components/AnimatedSequence.astro';
+
+# Compaction
+
+As conversations grow, pi compresses them to stay within context limits while preserving essential information.
+
+## The Problem
+
+LLMs have fixed context windows:
+
+```
+Context window: ~200,000 tokens
+Session after 6 months: ~500,000+ entries
+```
+
+Without compaction, you'd lose access to older context—or worse, hit hard errors.
+
+## How Compaction Works
+
+pi uses **semantic compaction**: it understands what's important in your conversation and preserves that.
+
+### Compaction Process
+
+1. **Identify key decisions** — Architecture choices, design patterns
+2. **Extract facts** — Technology stack, API locations, conventions
+3. **Preserve context** — Why things were done a certain way
+4. **Summarize transitions** — How the codebase evolved
+5. **Remove noise** — Boilerplate, obvious explanations, typos
+
+<AnimatedSequence
+  type="css"
+  steps={[
+    { id: 1, caption: "Full session history with all turns" },
+    { id: 2, caption: "Identify key decisions and facts" },
+    { id: 3, caption: "Extract important context" },
+    { id: 4, caption: "Create compacted summary" }
+  ]}
+  autoplay={false}
+/>
+
+## CompactionEntry Format
+
+When pi compacts, it creates structured entries:
+
+```json
+{
+  "type": "compaction",
+  "timestamp": "2024-03-15T14:30:00Z",
+  "version": "1.0",
+  "summary": {
+    "project": "my-app",
+    "language": "TypeScript",
+    "framework": "Next.js 14"
+  },
+  "decisions": [
+    {
+      "id": "auth-strategy",
+      "description": "Using NextAuth.js with credentials provider",
+      "rationale": "Simple enough for MVP, extensible for future"
+    },
+    {
+      "id": "db-choice",
+      "description": "PostgreSQL with Prisma ORM",
+      "rationale": "Type safety, migrations, familiar syntax"
+    }
+  ],
+  "facts": [
+    "API_BASE_URL is in .env.local",
+    "Components go in src/components/",
+    "Use 'use client' for interactive components"
+  ],
+  "current_state": {
+    "branch": "feature/payments",
+    "recent_work": "Implemented Stripe checkout flow",
+    "next_steps": "Add webhook handler for payment events"
+  }
+}
+```
+
+<Callout variant="info" title="Compaction is Lossless*">
+pi compaction preserves all *important* information. Minor details (exact phrasing, debug print statements, typos) are removed. The essence remains.
+</Callout>
+
+## When Compaction Triggers
+
+pi compacts automatically when:
+
+| Trigger | Threshold |
+|---------|-----------|
+| Token count | >100,000 tokens |
+| Turn count | >500 turns |
+| Time since last compaction | >7 days |
+| Manual request | `/compact` command |
+
+## Manual Compaction
+
+Force compaction anytime:
+
+```bash
+/compact
+```
+
+You'll see what pi considers important:
+
+```
+Compacting session...
+✓ Identified 12 key decisions
+✓ Extracted 47 facts
+✓ Preserved current state
+✓ Created summary (2,340 tokens)
+Session compacted successfully.
+```
+
+<Callout variant="tip" title="Before Big Refactors">
+Run `/compact` before major architectural changes. This ensures pi has clean context for the new work.
+</Callout>
+
+## Viewing Compaction History
+
+See all compactions in a session:
+
+```bash
+/sessions --view compaction-history
+```
+
+Output:
+```
+Session: my-app
+Compactions:
+  - 2024-03-15: Initial compaction (45,000 → 2,340 tokens)
+  - 2024-03-10: After auth feature merge (52,000 → 2,800 tokens)
+  - 2024-02-28: First compaction (28,000 → 1,900 tokens)
+```
+
+## Summary
+
+Compaction keeps long projects manageable:
+
+- **Automatic** triggers based on thresholds
+- **Semantic** preserves meaning, not exact words
+- **Structured** uses CompactionEntry format
+- **Transparent** you can view/audit compaction history
+
+<div style="text-align: center; margin-top: 2rem;">
+  <a href="/docs/superpowers/chapters/module-b/3-strategies" style="display: inline-block; padding: 0.75rem 1.5rem; background: var(--accent-primary); color: white; border-radius: 8px; text-decoration: none; font-weight: 500;">
+    Next: Strategies →
+  </a>
+</div>

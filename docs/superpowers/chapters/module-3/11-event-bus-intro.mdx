@@ -1,0 +1,98 @@
+---
+layout: '../../../src/layouts/ChapterLayout.astro'
+title: "Event bus intro"
+moduleName: "Module 3: Extending pi"
+chapterNumber: 12
+readingTime: "8 min read"
+description: "Learn how extensions communicate via the shared event bus."
+prevChapter:
+  title: "Commands & events"
+  href: "/docs/superpowers/chapters/module-3/10-commands-events"
+nextChapter:
+  title: "Agent Teams Overview"
+  href: "/docs/superpowers/chapters/module-a/1-agents-overview"
+---
+
+import Callout from '../../../src/components/Callout.astro';
+
+# Event bus intro
+
+Extensions can communicate with each other through pi's shared event bus.
+
+## The pi.events API
+
+```typescript
+// Emit an event
+pi.events.emit("my:notification", { message: "Hello", from: "extension-a" });
+
+// Listen for an event
+pi.events.on("my:notification", (data) => {
+  console.log("Received:", data);
+});
+
+// Listen once
+pi.events.once("my:ready", () => {
+  console.log("Extension is ready!");
+});
+
+// Unsubscribe
+const handler = (data) => { ... };
+pi.events.on("my:event", handler);
+pi.events.off("my:event", handler);
+```
+
+## Why Use the Event Bus?
+
+| Use Case | Example |
+|----------|---------|
+| **Decoupling** | Extension A notifies Extension B without direct imports |
+| **Coordination** | One extension triggers another's behavior |
+| **Logging** | Central extension collects events from all others |
+
+## Example: Notification Bridge
+
+Extension A (emitter):
+```typescript
+pi.registerCommand("notify", {
+  handler: async (args, ctx) => {
+    pi.events.emit("notification", { message: args });
+  },
+});
+```
+
+Extension B (listener):
+```typescript
+pi.events.on("notification", (data) => {
+  ctx.ui.notify(data.message, "info");
+});
+```
+
+Now `/notify Hello` in Extension A triggers Extension B!
+
+<Callout variant="tip" title="Event Naming">
+Use namespaced events like `my-ext:action`. This avoids collisions between extensions.
+</Callout>
+
+## Built-in Events
+
+pi emits its own events you can listen to:
+
+| Event | Data | When |
+|-------|------|------|
+| `session_start` | `{ cwd, sessionId }` | New session |
+| `session_end` | `{ cwd, sessionId }` | Session closed |
+| `tool_call` | `{ toolName, input }` | Before tool executes |
+| `tool_result` | `{ toolName, output }` | After tool completes |
+
+## Summary
+
+- ✓ `pi.events.emit()` sends events
+- ✓ `pi.events.on()` subscribes
+- ✓ `pi.events.once()` for one-time
+- ✓ `pi.events.off()` to unsubscribe
+
+<div style="text-align: center; margin-top: 2rem;">
+  <a href="/docs/superpowers/chapters/module-a/1-agents-overview" style="display: inline-block; padding: 0.75rem 1.5rem; background: var(--accent-primary); color: white; border-radius: 8px; text-decoration: none; font-weight: 500;">
+    Next: Agent Teams Overview →
+  </a>
+</div>

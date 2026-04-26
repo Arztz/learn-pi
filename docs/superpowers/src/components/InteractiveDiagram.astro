@@ -1,0 +1,486 @@
+---
+// Interactive Diagram Component - Clickable node diagrams
+
+interface Props {
+  type?: 'd3' | 'mermaid';
+  config?: string;
+  title?: string;
+}
+
+const { type = 'd3', config = '{}', title = 'Diagram' } = Astro.props;
+---
+
+<div class="interactive-diagram" data-type={type} data-config={config} data-title={title}>
+  <div class="diagram-header">
+    <h4 class="diagram-title">{title}</h4>
+    <div class="diagram-controls">
+      <button class="ctrl-btn zoom-in" aria-label="Zoom in">⊕</button>
+      <button class="ctrl-btn zoom-out" aria-label="Zoom out">⊖</button>
+      <button class="ctrl-btn legend-btn" aria-label="Toggle legend">?</button>
+    </div>
+  </div>
+
+  <div class="diagram-container" id="diagramContainer">
+    <!-- Diagram renders here -->
+  </div>
+
+  <div class="diagram-legend" id="diagramLegend">
+    <!-- Legend items -->
+  </div>
+
+  <!-- Detail Panel -->
+  <div class="detail-panel" id="detailPanel">
+    <button class="detail-close" aria-label="Close">← Back</button>
+    <div class="detail-content">
+      <h3 class="detail-title" id="detailTitle"></h3>
+      <p class="detail-role" id="detailRole"></p>
+      <div class="detail-section">
+        <h4>Tools</h4>
+        <p class="detail-tools" id="detailTools"></p>
+      </div>
+      <div class="detail-section">
+        <h4>Model</h4>
+        <p class="detail-model" id="detailModel"></p>
+      </div>
+      <div class="detail-section">
+        <h4>System Prompt</h4>
+        <pre class="detail-prompt" id="detailPrompt"></pre>
+      </div>
+      <button class="btn copy-prompt-btn" id="copyPromptBtn">Copy Prompt</button>
+    </div>
+  </div>
+</div>
+
+<style>
+  .interactive-diagram {
+    margin: var(--space-5) 0;
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+  }
+
+  .diagram-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-3) var(--space-4);
+    background-color: var(--bg-elevated);
+    border-bottom: 1px solid var(--border-subtle);
+  }
+
+  .diagram-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+  }
+
+  .diagram-controls {
+    display: flex;
+    gap: var(--space-2);
+  }
+
+  .ctrl-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-sm);
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 0.875rem;
+    transition: all var(--transition-fast);
+  }
+
+  .ctrl-btn:hover {
+    background-color: var(--bg-elevated);
+    color: var(--text-primary);
+  }
+
+  .diagram-container {
+    min-height: 250px;
+    padding: var(--space-4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: auto;
+  }
+
+  /* SVG Diagram Styles */
+  :global(.diagram-svg) {
+    width: 100%;
+    max-width: 600px;
+    height: auto;
+  }
+
+  :global(.diagram-node) {
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  :global(.diagram-node:hover) {
+    filter: drop-shadow(0 0 8px rgba(124, 58, 237, 0.3));
+  }
+
+  :global(.diagram-link) {
+    transition: stroke 0.15s ease;
+  }
+
+  /* Legend */
+  .diagram-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+    padding: var(--space-3) var(--space-4);
+    background-color: var(--bg-deep);
+    border-top: 1px solid var(--border-subtle);
+    font-size: 0.75rem;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    color: var(--text-muted);
+  }
+
+  .legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+  }
+
+  .legend-dot.orchestrator { background-color: var(--accent-primary); }
+  .legend-dot.techlead { background-color: var(--tool-call); }
+  .legend-dot.devlead { background-color: var(--success); }
+  .legend-dot.devsenior { background-color: var(--warning); }
+
+  /* Detail Panel */
+  .detail-panel {
+    display: none;
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 320px;
+    height: 100%;
+    background-color: var(--bg-surface);
+    border-left: 1px solid var(--border-subtle);
+    padding: var(--space-5);
+    overflow-y: auto;
+    z-index: 10;
+    animation: slideIn 0.25s ease;
+  }
+
+  .detail-panel.open {
+    display: block;
+  }
+
+  @keyframes slideIn {
+    from { transform: translateX(100%); }
+    to { transform: translateX(0); }
+  }
+
+  .detail-close {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-size: 0.875rem;
+    cursor: pointer;
+    padding: var(--space-2) 0;
+    margin-bottom: var(--space-4);
+  }
+
+  .detail-close:hover {
+    color: var(--text-primary);
+  }
+
+  .detail-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 var(--space-2) 0;
+  }
+
+  .detail-role {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    margin-bottom: var(--space-5);
+  }
+
+  .detail-section {
+    margin-bottom: var(--space-4);
+  }
+
+  .detail-section h4 {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: var(--space-2);
+  }
+
+  .detail-tools,
+  .detail-model {
+    font-size: 0.875rem;
+    color: var(--text-primary);
+    font-family: var(--font-code);
+  }
+
+  .detail-prompt {
+    font-size: 0.8125rem;
+    color: var(--text-secondary);
+    background-color: var(--bg-deep);
+    padding: var(--space-3);
+    border-radius: var(--radius-md);
+    white-space: pre-wrap;
+    margin: 0;
+  }
+
+  .copy-prompt-btn {
+    width: 100%;
+    margin-top: var(--space-4);
+  }
+
+  /* Responsive */
+  @media (max-width: 767px) {
+    .detail-panel {
+      width: 100%;
+      height: auto;
+      position: relative;
+      border-left: none;
+      border-top: 1px solid var(--border-subtle);
+    }
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const diagrams = document.querySelectorAll('.interactive-diagram');
+
+    diagrams.forEach(diag => {
+      const container = diag.querySelector('#diagramContainer');
+      const legend = diag.querySelector('#diagramLegend');
+      const detailPanel = diag.querySelector('#detailPanel');
+      const zoomInBtn = diag.querySelector('.zoom-in');
+      const zoomOutBtn = diag.querySelector('.zoom-out');
+      const legendBtn = diag.querySelector('.legend-btn');
+      const closeBtn = diag.querySelector('.detail-close');
+      const copyBtn = diag.querySelector('#copyPromptBtn');
+
+      // Parse config
+      let config = {};
+      try {
+        config = JSON.parse(diag.dataset.config || '{}');
+      } catch (e) {
+        console.error('Failed to parse diagram config:', e);
+      }
+
+      const nodes = config.nodes || [];
+      const links = config.links || [];
+
+      // Render legend
+      if (legend && nodes.length) {
+        const nodeTypes = [...new Set(nodes.map(n => n.type).filter(Boolean))];
+        legend.innerHTML = nodeTypes.map(type => `
+          <div class="legend-item">
+            <span class="legend-dot ${type}"></span>
+            <span>${type.charAt(0).toUpperCase() + type.slice(1)}</span>
+          </div>
+        `).join('');
+      }
+
+      // Simple SVG rendering (full D3 would require D3 library)
+      if (container && nodes.length) {
+        const nodeWidth = 140;
+        const nodeHeight = 50;
+        const hSpacing = 180;
+        const vSpacing = 80;
+
+        // Calculate positions
+        const positions = calculatePositions(nodes, nodeWidth, nodeHeight, hSpacing, vSpacing);
+
+        // Create SVG
+        const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        svg.setAttribute('class', 'diagram-svg');
+        svg.setAttribute('viewBox', `0 0 600 ${100 + Math.max(...nodes.map(n => positions[n.id]?.y || 0)) + nodeHeight + 50}`);
+        svg.style.maxWidth = '100%';
+
+        // Render links
+        links.forEach(link => {
+          const from = positions[link.from];
+          const to = positions[link.to];
+          if (from && to) {
+            const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            const midX = (from.x + nodeWidth + to.x) / 2;
+            path.setAttribute('d', `M ${from.x + nodeWidth} ${from.y + nodeHeight / 2}
+                                    C ${midX} ${from.y + nodeHeight / 2},
+                                      ${midX} ${to.y + nodeHeight / 2},
+                                      ${to.x} ${to.y + nodeHeight / 2}`);
+            path.setAttribute('fill', 'none');
+            path.setAttribute('stroke', 'var(--border-subtle)');
+            path.setAttribute('stroke-width', '2');
+            svg.appendChild(path);
+          }
+        });
+
+        // Render nodes
+        nodes.forEach(node => {
+          const pos = positions[node.id];
+          if (!pos) return;
+
+          const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+          g.setAttribute('class', 'diagram-node');
+          g.setAttribute('transform', `translate(${pos.x}, ${pos.y})`);
+          g.style.cursor = 'pointer';
+
+          const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+          rect.setAttribute('width', String(nodeWidth));
+          rect.setAttribute('height', String(nodeHeight));
+          rect.setAttribute('rx', '8');
+          rect.setAttribute('fill', 'var(--bg-surface)');
+          rect.setAttribute('stroke', 'var(--border-subtle)');
+          rect.setAttribute('stroke-width', '2');
+          g.appendChild(rect);
+
+          const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+          text.setAttribute('x', String(nodeWidth / 2));
+          text.setAttribute('y', String(nodeHeight / 2 + 5));
+          text.setAttribute('text-anchor', 'middle');
+          text.setAttribute('fill', 'var(--text-primary)');
+          text.setAttribute('font-size', '12');
+          text.setAttribute('font-weight', '500');
+          text.textContent = node.label || node.id;
+          g.appendChild(text);
+
+          // Color dot for type
+          const typeColors = {
+            orchestrator: 'var(--accent-primary)',
+            techlead: 'var(--tool-call)',
+            devlead: 'var(--success)',
+            devsenior: 'var(--warning)'
+          };
+          if (node.type && typeColors[node.type]) {
+            const dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            dot.setAttribute('cx', '12');
+            dot.setAttribute('cy', '12');
+            dot.setAttribute('r', '6');
+            dot.setAttribute('fill', typeColors[node.type]);
+            g.appendChild(dot);
+          }
+
+          // Click to show detail
+          g.addEventListener('click', () => showNodeDetail(node));
+
+          // Hover effects
+          g.addEventListener('mouseenter', () => {
+            rect.setAttribute('stroke', 'var(--accent-primary)');
+          });
+          g.addEventListener('mouseleave', () => {
+            rect.setAttribute('stroke', 'var(--border-subtle)');
+          });
+
+          svg.appendChild(g);
+        });
+
+        container.appendChild(svg);
+      }
+
+      // Show node detail panel
+      function showNodeDetail(node) {
+        if (!detailPanel) return;
+
+        const titleEl = detailPanel.querySelector('#detailTitle');
+        const roleEl = detailPanel.querySelector('#detailRole');
+        const toolsEl = detailPanel.querySelector('#detailTools');
+        const modelEl = detailPanel.querySelector('#detailModel');
+        const promptEl = detailPanel.querySelector('#detailPrompt');
+
+        if (titleEl) titleEl.textContent = node.label || node.id;
+        if (roleEl) roleEl.textContent = `Role: ${node.description || node.type || 'agent'}`;
+        if (toolsEl) toolsEl.textContent = (node.tools || ['read', 'bash', 'edit', 'write']).join(', ');
+        if (modelEl) modelEl.textContent = node.model || 'claude-sonnet-4-5';
+        if (promptEl) promptEl.textContent = node.systemPrompt || `You are a ${node.label || node.id}.`;
+
+        detailPanel.classList.add('open');
+      }
+
+      // Close detail panel
+      closeBtn?.addEventListener('click', () => {
+        detailPanel?.classList.remove('open');
+      });
+
+      // Copy prompt
+      copyBtn?.addEventListener('click', () => {
+        const promptEl = detailPanel?.querySelector('#detailPrompt');
+        if (promptEl) {
+          navigator.clipboard.writeText(promptEl.textContent || '').then(() => {
+            copyBtn.textContent = 'Copied!';
+            setTimeout(() => { copyBtn.textContent = 'Copy Prompt'; }, 2000);
+          });
+        }
+      });
+
+      // Toggle legend
+      legendBtn?.addEventListener('click', () => {
+        legend?.classList.toggle('hidden');
+      });
+
+      // Zoom controls (simple implementation)
+      let scale = 1;
+      zoomInBtn?.addEventListener('click', () => {
+        scale = Math.min(scale + 0.2, 2);
+        applyZoom();
+      });
+      zoomOutBtn?.addEventListener('click', () => {
+        scale = Math.max(scale - 0.2, 0.5);
+        applyZoom();
+      });
+
+      function applyZoom() {
+        const svg = container?.querySelector('svg');
+        if (svg) {
+          svg.style.transform = `scale(${scale})`;
+          svg.style.transformOrigin = 'center';
+        }
+      }
+    });
+
+    // Helper: Calculate node positions
+    function calculatePositions(nodes, nodeWidth, nodeHeight, hSpacing, vSpacing) {
+      const positions = {};
+      const levels = {};
+
+      nodes.forEach(node => {
+        const level = node.level || 0;
+        if (!levels[level]) levels[level] = [];
+        levels[level].push(node);
+      });
+
+      const centerX = 300;
+
+      Object.keys(levels).forEach(levelStr => {
+        const level = parseInt(levelStr);
+        const nodesAtLevel = levels[level];
+        const totalWidth = (nodesAtLevel.length - 1) * hSpacing;
+        const startX = centerX - totalWidth / 2 - nodeWidth / 2;
+
+        nodesAtLevel.forEach((node, index) => {
+          positions[node.id] = {
+            x: startX + index * hSpacing,
+            y: 50 + level * vSpacing
+          };
+        });
+      });
+
+      return positions;
+    }
+  });
+</script>

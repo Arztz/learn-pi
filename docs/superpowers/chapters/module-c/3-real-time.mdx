@@ -1,0 +1,286 @@
+---
+layout: '../../../src/layouts/ChapterLayout.astro'
+title: "Real-time coordination"
+moduleName: "Module C: Event Bus Deep Dive"
+chapterNumber: "C3"
+readingTime: "7 min read"
+description: "Coordinate multiple extensions for complex workflows like progress tracking and status updates."
+prevChapter:
+  title: "Pub/sub patterns"
+  href: "/docs/superpowers/chapters/module-c/2-pubsub-patterns"
+nextChapter:
+  title: "Course Complete!"
+  href: "/docs/superpowers/chapters/module-a/1-agents-overview"
+---
+
+import Callout from '../../../src/components/Callout.astro';
+
+# Real-time coordination
+
+Real-world scenarios coordinating multiple extensions working together.
+
+## Scenario: Live Build Progress
+
+Imagine a build system with multiple extensions:
+
+- **Build runner** — executes builds
+- **Test runner** — runs tests in parallel
+- **UI notifier** — shows progress to user
+- **Logger** — records all events
+
+```
+User triggers build
+       │
+       ▼
+┌─────────────────┐
+│  Build Runner   │──► emit('build:start')
+       │                │
+       ├────────────────┼────────────────┐
+       │                │                │
+       ▼                ▼                ▼
+┌─────────────┐  ┌─────────────┐  ┌─────────────┐
+│Test Runner A│  │Test Runner B│  │ UI Notifier │
+│(unit tests) │  │(e2e tests)  │  │             │
+└──────┬──────┘  └──────┬──────┘  └──────┬──────┘
+       │                │                │
+       ▼                ▼                ▼
+  emit('test:start)  emit('test:start)  update UI
+       │                │
+       └───────┬────────┘
+               ▼
+        emit('test:complete)
+               │
+               ▼
+        emit('build:complete)
+```
+
+## Implementation
+
+### Build Runner Extension
+
+```typescript
+export const buildRunner = {
+  name: 'build-runner',
+  version: '1.0.0',
+
+  async runBuild(config: BuildConfig) {
+    pi.events.emit('build:start', { timestamp: Date.now() });
+
+    try {
+      // Run TypeScript compilation
+      pi.events.emit('build:phase', { phase: 'compile', status: 'start' });
+      await typescript.compile(config);
+      pi.events.emit('build:phase', { phase: 'compile', status: 'complete' });
+
+      // Run tests in parallel
+      pi.events.emit('build:phase', { phase: 'test', status: 'start' });
+      const testResults = await Promise.all([
+        this.runUnitTests(),
+        this.runE2ETests()
+      ]);
+      pi.events.emit('build:phase', { phase: 'test', status: 'complete', results: testResults });
+
+      // Bundle
+      pi.events.emit('build:phase', { phase: 'bundle', status: 'start' });
+      await bundler.bundle(config);
+      pi.events.emit('build:phase', { phase: 'bundle', status: 'complete' });
+
+      pi.events.emit('build:complete', { success: true, duration: Date.now() });
+    } catch (error) {
+      pi.events.emit('build:error', { error: error.message });
+    }
+  }
+};
+```
+
+### UI Notifier Extension
+
+```typescript
+export const uiNotifier = {
+  name: 'ui-notifier',
+  version: '1.0.0',
+
+  state: { currentBuild: null, phases: [] },
+
+  register() {
+    pi.events.on('build:start', this.onBuildStart.bind(this));
+    pi.events.on('build:phase', this.onBuildPhase.bind(this));
+    pi.events.on('build:complete', this.onBuildComplete.bind(this));
+    pi.events.on('build:error', this.onBuildError.bind(this));
+  },
+
+  onBuildStart() {
+    this.state.currentBuild = { startTime: Date.now(), phases: [] };
+    ui.showBuildModal();
+  },
+
+  onBuildPhase({ phase, status, results }) {
+    const phaseData = { name: phase, status, results };
+    this.state.currentBuild.phases.push(phaseData);
+    ui.updateBuildProgress(phaseData);
+  },
+
+  onBuildComplete({ success, duration }) {
+    this.state.currentBuild = null;
+    ui.hideBuildModal();
+    ui.showToast(success ? 'Build successful!' : 'Build failed');
+  },
+
+  onBuildError({ error }) {
+    ui.hideBuildModal();
+    ui.showError(`Build error: ${error}`);
+  }
+};
+```
+
+### Logger Extension
+
+```typescript
+export const buildLogger = {
+  name: 'build-logger',
+  version: '1.0.0',
+
+  logs: [],
+
+  register() {
+    pi.events.on('build:start', this.onBuildStart.bind(this));
+    pi.events.on('build:phase', this.onBuildPhase.bind(this));
+    pi.events.on('build:complete', this.onBuildComplete.bind(this));
+  },
+
+  onBuildStart() {
+    this.logs.push({ event: 'build:start', timestamp: Date.now() });
+  },
+
+  onBuildPhase({ phase, status, results }) {
+    this.logs.push({
+      event: 'build:phase',
+      phase,
+      status,
+      results,
+      timestamp: Date.now()
+    });
+  },
+
+  onBuildComplete({ success, duration }) {
+    this.logs.push({
+      event: 'build:complete',
+      success,
+      duration,
+      timestamp: Date.now()
+    });
+    this.writeLogFile();
+  },
+
+  async writeLogFile() {
+    const content = this.logs.map(l => JSON.stringify(l)).join('\n');
+    await pi.fs.write('.pi/builds.log', content);
+  }
+};
+```
+
+## Scenario: File Watcher Chain
+
+Extensions reacting to file changes:
+
+```typescript
+// File watcher (core)
+pi.events.on('file:changed', ({ path, type }) => {
+  pi.events.emit('file:sync', { path, type, timestamp: Date.now() });
+});
+
+// Type checker reacts
+pi.events.on('file:sync', async ({ path }) => {
+  if (isTypeScriptFile(path)) {
+    const errors = await tsc.checkFile(path);
+    pi.events.emit('typecheck:result', { path, errors });
+  }
+});
+
+// Linter reacts
+pi.events.on('file:sync', async ({ path }) => {
+  const warnings = await eslint.checkFile(path);
+  pi.events.emit('lint:result', { path, warnings });
+});
+
+// Test runner reacts
+pi.events.on('file:sync', async ({ path }) => {
+  if (isTestFile(path)) {
+    const results = await jest.runFile(path);
+    pi.events.emit('test:result', { path, results });
+  }
+});
+
+// UI aggregator reacts to all results
+pi.events.on('typecheck:result', (data) => this.updatePanel('types', data));
+pi.events.on('lint:result', (data) => this.updatePanel('lint', data));
+pi.events.on('test:result', (data) => this.updatePanel('tests', data));
+```
+
+<Callout variant="info" title="Parallel Reactions">
+When file changes, multiple extensions react in parallel. The event bus fan-out enables this naturally—no extension needs to know about the others.
+</Callout>
+
+## Scenario: Orchestrated Deployment
+
+Deployment pipeline with coordinated phases:
+
+```typescript
+// Phase 1: Prepare
+pi.events.on('deploy:start', async () => {
+  pi.events.emit('deploy:phase', { phase: 'prepare', status: 'start' });
+  await deployer.prepare();
+  pi.events.emit('deploy:phase', { phase: 'prepare', status: 'complete' });
+});
+
+// Phase 2: Build (after prepare)
+pi.events.on('deploy:phase', ({ phase, status }) => {
+  if (phase === 'prepare' && status === 'complete') {
+    pi.events.emit('deploy:phase', { phase: 'build', status: 'start' });
+  }
+});
+
+// Phase 2: Build
+pi.events.on('deploy:phase', async ({ phase, status }) => {
+  if (phase === 'build' && status === 'start') {
+    await deployer.build();
+    pi.events.emit('deploy:phase', { phase: 'build', status: 'complete' });
+  }
+});
+
+// Notify on each completion
+pi.events.on('deploy:phase', ({ phase, status }) => {
+  if (status === 'complete') {
+    notify.slack(`Deployment ${phase} complete`);
+    notify.analytics.track('deploy_phase', { phase });
+  }
+});
+```
+
+## Summary
+
+Real-time coordination patterns:
+
+| Pattern | Extension Role |
+|---------|----------------|
+| Fan-out | One event, many handlers |
+| Pipeline | Sequential processing |
+| State aggregation | Collect results from multiple sources |
+| Cross-cutting concerns | Logging, analytics, monitoring |
+
+<Callout variant="success" title="Module C Complete!">
+You've mastered the event bus:
+
+- **API**: emit(), on(), once(), off()
+- **Patterns**: request/response, observer, broadcast, chain
+- **Coordination**: multi-extension workflows
+- **Cleanup**: preventing memory leaks
+
+This concludes the pi learning guide! You now know everything from basic usage to advanced multi-agent systems and extension development.
+</Callout>
+
+<div style="text-align: center; margin-top: 2rem;">
+  <a href="/docs/superpowers/" style="display: inline-block; padding: 0.75rem 1.5rem; background: var(--accent-primary); color: white; border-radius: 8px; text-decoration: none; font-weight: 500;">
+    Back to Home →
+  </a>
+</div>

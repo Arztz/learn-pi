@@ -1,0 +1,125 @@
+---
+layout: '../../../src/layouts/ChapterLayout.astro'
+title: "Hello, pi!"
+moduleName: "Module 1: Getting Started"
+chapterNumber: 3
+readingTime: "8 min read"
+description: "Send your first prompt and understand how pi responds with tool calls."
+---
+
+import Callout from '../../../src/components/Callout.astro';
+
+# Hello, pi!
+
+Time to send your first prompt. This chapter teaches you what pi's responses look like and how tool calls work.
+
+## Your First Prompt
+
+Run pi and type:
+
+```
+Hello, what can you do?
+```
+
+pi will respond with a friendly message explaining its capabilities. Since this is just a conversation, no tools are needed yet.
+
+## Tool Calls Explained
+
+When pi needs to actually DO something (read a file, run a command, write code), it uses **tool calls**.
+
+Here's what happens when you ask pi to list files:
+
+```
+> List files in the current directory
+
+◐ Thinking...
+  The user wants to see what files are in the current directory.
+  I should use the `bash` tool to run `ls`.
+
+ℹ bash { command: "ls" }
+
+✓ Tool: bash
+   src/
+   package.json
+   README.md
+   tsconfig.json
+
+That's the contents of your current directory!
+```
+
+### Anatomy of a Tool Call
+
+| Part | Example | Meaning |
+|------|---------|---------|
+| **Thinking block** | `◐ Thinking...` | Shows pi's reasoning (collapsible) |
+| **Tool invocation** | `ℹ bash { command: "ls" }` | The tool being called |
+| **Result** | `✓ Tool: bash` + output | The tool's execution result |
+
+## Understanding the TUI
+
+pi's interactive mode has several parts:
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│ Hotkeys: Ctrl+C clear | Ctrl+L model | Ctrl+P cycle | Esc    │  <- Header
+├─────────────────────────────────────────────────────────────┤
+│ > Hello, what can you do?                                   │
+│                                                             │
+│ ◐ Thinking...                                               │
+│                                                             │
+│ I can help you with coding tasks! I have access to tools    │
+│ that let me read, write, and edit files, run shell commands,│
+│ and more.                                                    │
+│                                                             │
+│ What would you like to work on?                            │
+├─────────────────────────────────────────────────────────────┤
+│ ~/projects/my-app  session: main  ↑2.1k ↓512  $0.0023      │  <- Footer
+└─────────────────────────────────────────────────────────────┘
+```
+
+<Callout variant="info" title="Thinking Blocks">
+The thinking block shows how pi reasons about your request. Click it to expand/collapse. Thinking blocks are only visible when thinking level is not "off".
+</Callout>
+
+## Try It Yourself
+
+In your terminal:
+
+```bash
+pi
+```
+
+Then type these prompts one at a time:
+
+1. `"Hello!"` — Just a greeting, no tools
+2. `"What files are in this directory?"` — Uses bash tool
+3. `"Read the README.md file"` — Uses read tool
+
+Watch how pi decides whether to use a tool!
+
+## The Four Built-in Tools
+
+| Tool | Purpose | When to Use |
+|------|---------|-------------|
+| **read** | Read file contents | Viewing code, configs, docs |
+| **write** | Create new files | New files, complete rewrites |
+| **edit** | Modify existing files | Targeted changes, patches |
+| **bash** | Run shell commands | Git, npm, file ops, compilation |
+
+## Summary
+
+In this chapter you learned:
+
+- ✓ How to start a conversation with pi
+- ✓ What tool calls look like in responses
+- ✓ The anatomy of a tool call (thinking → tool → result)
+- ✓ The four built-in tools
+
+<div style="text-align: center; margin-top: 2rem;">
+  <a href="/docs/superpowers/chapters/module-1/0-what-is-pi" style="display: inline-block; padding: 0.5rem 1rem; background: var(--bg-surface); color: var(--text-secondary); border: 1px solid var(--border-subtle); border-radius: 8px; text-decoration: none; margin-right: 1rem;">
+    ← Previous
+  </a>
+  <a href="/docs/superpowers/chapters/module-2/3-reading-files" style="display: inline-block; padding: 0.75rem 1.5rem; background: var(--accent-primary); color: white; border-radius: 8px; text-decoration: none; font-weight: 500;">
+    Next: Reading files →
+  </a>
+</div>

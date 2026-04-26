@@ -1,0 +1,109 @@
+---
+layout: '../../../src/layouts/ChapterLayout.astro'
+title: "Writing & editing"
+moduleName: "Module 2: Core Workflow"
+chapterNumber: 5
+readingTime: "8 min read"
+description: "Learn when to use edit vs write and how pi modifies files."
+prevChapter:
+  title: "Reading files"
+  href: "/docs/superpowers/chapters/module-2/3-reading-files"
+nextChapter:
+  title: "Bash commands"
+  href: "/docs/superpowers/chapters/module-2/5-bash"
+---
+
+import Callout from '../../../src/components/Callout.astro';
+
+# Writing & editing
+
+pi has two tools for file modifications: `write` for new files and `edit` for changes.
+
+## The write Tool
+
+Creates a new file or overwrites an existing one completely:
+
+```
+ℹ write {
+  file_path: "src/new-component.ts",
+  content: "export function Hello() {\n  return <p>World</p>;\n}\n"
+}
+```
+
+<Callout variant="warning" title="write replaces files">
+If `src/new-component.ts` already exists, write replaces it entirely. Use edit for partial changes.
+</Callout>
+
+## The edit Tool
+
+Makes targeted changes to existing files:
+
+```
+ℹ edit {
+  file_path: "src/index.ts",
+  old_string: "export default App;",
+  new_string: "export { App };"
+}
+```
+
+| Parameter | Meaning |
+|-----------|---------|
+| `old_string` | Exact text to find (must match exactly) |
+| `new_string` | Text to replace it with |
+
+## When to Use Each
+
+| Tool | Use When |
+|------|----------|
+| **write** | Creating new files, complete rewrites |
+| **edit** | Changing specific parts, bug fixes |
+
+### Example: Bug Fix
+
+```
+"Change the greeting from 'Hello' to 'Hi' in src/greeting.ts"
+```
+
+pi uses `edit` with `old_string: "'Hello'"` → `new_string: "'Hi'"`.
+
+### Example: New Feature
+
+```
+"Create a new file src/utils/format.ts with a date formatter"
+```
+
+pi uses `write` with the new file contents.
+
+## Verification
+
+After edits, pi often reads the file to confirm changes:
+
+```
+✓ Tool: read { file_path: "src/greeting.ts" }
+   export function greet(name: string): string {
+-    return `Hello, ${name}!`;
++    return `Hi, ${name}!`;
+   }
+```
+
+The `+` and `-` show the diff (added vs removed lines).
+
+## Best Practices
+
+1. **Be specific** — "Edit the function on line 45" is clearer than "fix the function"
+2. **Confirm after** — pi will often verify changes by reading the file
+3. **Check git status** — Use `!git diff` to review changes before committing
+
+## Exercises
+
+Try these in pi:
+
+1. `"Create a new file README.dev.md explaining how to run the project"`
+2. `"Add TypeScript types to the JavaScript file src/utils.js"`
+3. `"Update the version in package.json from 1.0.0 to 1.1.0"`
+
+<div style="text-align: center; margin-top: 2rem;">
+  <a href="/docs/superpowers/chapters/module-2/5-bash" style="display: inline-block; padding: 0.75rem 1.5rem; background: var(--accent-primary); color: white; border-radius: 8px; text-decoration: none; font-weight: 500;">
+    Next: Bash commands →
+  </a>
+</div>

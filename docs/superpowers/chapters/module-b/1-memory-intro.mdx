@@ -1,0 +1,103 @@
+---
+layout: '../../../src/layouts/ChapterLayout.astro'
+title: "Memory intro"
+moduleName: "Module B: Persistent Memory"
+chapterNumber: "B1"
+readingTime: "5 min read"
+description: "What is persistent memory in pi and why it matters for long coding sessions."
+prevChapter:
+  title: "Module A Conclusion"
+  href: "/docs/superpowers/chapters/module-a/6-comparing-results"
+nextChapter:
+  title: "Compaction"
+  href: "/docs/superpowers/chapters/module-b/2-compaction"
+---
+
+import Callout from '../../../src/components/Callout.astro';
+
+# Memory intro
+
+pi stores your conversations and context across sessions—so you can pick up right where you left off.
+
+## What is Persistent Memory?
+
+When you work with pi on a project, it accumulates context:
+
+```
+Session 1: "Add user authentication"
+Session 2: "Add password reset"
+Session 3: "Fix login bug"
+Session 4: (pi remembers all previous work)
+```
+
+<Callout variant="info" title="Sessions are Stored">
+Every pi session is saved as a JSONL file in `~/.pi/sessions/`. This is your project's memory.
+</Callout>
+
+## Why Memory Matters
+
+Without persistent memory, you'd have to re-explain your codebase every session:
+
+| Without Memory | With Memory |
+|-----------------|-------------|
+| "This is a React app" | pi already knows |
+| "We use TypeScript" | pi already knows |
+| "API is at /api/v1" | pi already knows |
+| "Our auth flow is..." | pi already knows |
+
+This means faster startups, better context, and more coherent long-term assistance.
+
+## How pi Manages Memory
+
+pi automatically:
+
+1. **Stores sessions** in `~/.pi/sessions/[project]/`
+2. **Tracks context** across conversations
+3. **Resumes sessions** with `/resume`
+4. **Compacts context** when it grows too large
+
+<Callout variant="tip" title="Long Projects = More Value">
+Memory becomes increasingly valuable as projects grow. A 6-month codebase has accumulated months of decisions—pi remembers them all.
+</Callout>
+
+## Session Files
+
+Each project has its own session tree:
+
+```
+~/.pi/sessions/my-project/
+├── session-2024-01-15-143022.jsonl    # Original session
+├── session-2024-01-15-143022-1.jsonl # Branch: feature-auth
+├── session-2024-01-15-143022-2.jsonl # Branch: feature-ui
+└── session-2024-01-16-091534.jsonl    # Forked from branch
+```
+
+## Key Commands
+
+| Command | Purpose |
+|---------|---------|
+| `/sessions` | List all sessions |
+| `/resume` | Resume a previous session |
+| `/compact` | Manually trigger compaction |
+| `/tree` | View session tree |
+
+<Callout variant="warning" title="Context Limits">
+LLMs have context limits. pi's compaction system ensures you never hit those limits—even on years-long projects.
+</Callout>
+
+## Summary
+
+Persistent memory is what makes pi powerful for long-term projects:
+
+- **Sessions stored** as JSONL files
+- **Context preserved** across work sessions
+- **Automatic management** via compaction
+- **Manual control** via commands
+
+Next, we'll dive into **compaction**—how pi keeps context manageable.
+
+<div style="text-align: center; margin-top: 2rem;">
+  <a href="/docs/superpowers/chapters/module-b/2-compaction" style="display: inline-block; padding: 0.75rem 1.5rem; background: var(--accent-primary); color: white; border-radius: 8px; text-decoration: none; font-weight: 500;">
+    Next: Compaction →
+  </a>
+</div>

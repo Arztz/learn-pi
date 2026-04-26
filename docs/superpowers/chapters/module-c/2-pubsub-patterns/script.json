@@ -1,0 +1,25 @@
+{
+  "turns": [
+    {
+      "role": "user",
+      "content": "Show me an example of the observer pattern with events"
+    },
+    {
+      "role": "assistant",
+      "thinking": "The user wants to see the observer pattern using pi events. I'll show a real-world example with multiple extensions observing build state.",
+      "content": "Here's a real-time example of the observer pattern:\n\n## Scenario: Build State Observer\n\n**Extension A: Build Runner** (emits events)\n```typescript\nexport const buildRunner = {\n  name: 'build-runner',\n  \n  async runBuild() {\n    pi.events.emit('build:start', { timestamp: Date.now() });\n    \n    try {\n      await this.compile();\n      pi.events.emit('build:phase', { phase: 'compile' });\n      \n      await this.test();\n      pi.events.emit('build:phase', { phase: 'test' });\n      \n      pi.events.emit('build:complete', { success: true });\n    } catch (error) {\n      pi.events.emit('build:error', { error: error.message });\n    }\n  }\n};\n```"
+    },
+    {
+      "role": "assistant",
+      "content": "**Extension B: UI Notifier** (observes events)\n\n```typescript\nexport const uiNotifier = {\n  name: 'ui-notifier',\n  \n  register() {\n    // Observer pattern: react to state changes\n    pi.events.on('build:start', () => showBuildModal());\n    pi.events.on('build:phase', ({ phase }) => updateProgress(phase));\n    pi.events.on('build:complete', () => hideModal());\n    pi.events.on('build:error', ({ error }) => showError(error));\n  }\n};\n```\n\n**Extension C: Logger** (also observes)\n\n```typescript\nexport const logger = {\n  name: 'logger',\n  \n  register() {\n    pi.events.on('build:start', () => log('Build started'));\n    pi.events.on('build:complete', ({ success }) => log(`Build ${success ? 'succeeded' : 'failed'}`));\n  }\n};\n```"
+    },
+    {
+      "role": "assistant",
+      "content": "## How It Works\n\n```\nbuild:start event\n       │\n       ├──► UI Notifier ──► Shows modal\n       │\n       └──► Logger ──► Records log\n\nbuild:phase event\n       │\n       ├──► UI Notifier ──► Updates progress\n       │\n       └──► Logger ──► Records phase\n```\n\n**Key insight:** Build runner doesn't know about UI or Logger—it just emits events. Extensions react independently. This is **decoupled** design."
+    },
+    {
+      "role": "assistant",
+      "content": "<Callout variant=\"tip\" title=\"Benefits\">\n- **Add new observers** without modifying the emitter\n- **Remove observers** without breaking the emitter\n- **Test each part** independently\n- **Extend functionality** by adding more observers\n</Callout>"
+    }
+  ]
+}

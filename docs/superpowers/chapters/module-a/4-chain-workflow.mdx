@@ -1,0 +1,73 @@
+---
+layout: '../../../src/layouts/ChapterLayout.astro'
+title: "Chain workflow"
+moduleName: "Module A: Agent Teams"
+chapterNumber: "A4"
+readingTime: "10 min read"
+description: "Chain agents together so output flows from one to the next."
+prevChapter:
+  title: "Parallel agents"
+  href: "/docs/superpowers/chapters/module-a/3-parallel-agents"
+nextChapter:
+  title: "Tech lead pattern"
+  href: "/docs/superpowers/chapters/module-a/5-tech-lead-pattern"
+---
+
+import Callout from '../../../src/components/Callout.astro';
+
+# Chain workflow
+
+Run agents sequentially, passing output from one to the next.
+
+## Syntax
+
+```json
+{
+  "chain": [
+    { "agent": "scout", "task": "Find files related to auth" },
+    { "agent": "planner", "task": "Plan improvements for {previous}" },
+    { "agent": "worker", "task": "Implement the plan from {previous}" }
+  ]
+}
+```
+
+The `{previous}` placeholder is replaced with the previous step's output.
+
+## Example
+
+```
+Use chain: scout → planner → worker to add Redis caching
+```
+
+1. **Scout** finds auth-related files
+2. **Planner** creates an implementation plan based on scout's findings
+3. **Worker** implements the plan
+
+## Workflow Prompts
+
+The subagent extension includes pre-built prompts:
+
+| Prompt | Flow |
+|--------|------|
+| `/implement <task>` | scout → planner → worker |
+| `/scout-and-plan <task>` | scout → planner |
+| `/implement-and-review <task>` | worker → reviewer → worker |
+
+<Callout variant="tip" title="Chain vs Parallel">
+Use **chain** when steps depend on each other (output flows forward). Use **parallel** when steps are independent and can run simultaneously.
+</Callout>
+
+## Error Handling
+
+If any step fails, the chain stops and reports which step failed:
+
+```
+Chain stopped at step 2 (planner): Invalid context
+Error: Model timeout
+```
+
+<div style="text-align: center; margin-top: 2rem;">
+  <a href="/docs/superpowers/chapters/module-a/5-tech-lead-pattern" style="display: inline-block; padding: 0.75rem 1.5rem; background: var(--accent-primary); color: white; border-radius: 8px; text-decoration: none; font-weight: 500;">
+    Next: Tech lead pattern →
+  </a>
+</div>

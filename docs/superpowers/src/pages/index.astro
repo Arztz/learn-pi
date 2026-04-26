@@ -1,0 +1,441 @@
+---
+// Landing Page - Hero + Module Cards
+import '../styles/global.css';
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pi Learning Guide | Learn pi from Zero to Hero</title>
+  <meta name="description" content="Interactive tutorial website for learning pi coding agent from basics to advanced topics including agent teams, persistent memory, and event bus.">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+</head>
+<body>
+  <div class="landing">
+    <!-- Hero Section -->
+    <header class="hero">
+      <div class="hero-content">
+        <div class="hero-badge">Interactive Learning</div>
+        <h1 class="hero-title">Learn <span class="accent">pi</span> from Zero to Hero</h1>
+        <p class="hero-subtitle">
+          Master the terminal coding harness through story-driven chapters,
+          interactive code examples, and animated visualizations.
+        </p>
+        <div class="hero-actions">
+          <a href="/docs/superpowers/chapters/module-1/0-what-is-pi" class="btn btn-primary btn-lg">
+            Start Learning
+          </a>
+          <a href="#modules" class="btn btn-ghost">
+            View Modules
+          </a>
+        </div>
+      </div>
+      <div class="hero-visual">
+        <div class="visual-card">
+          <div class="card-header">
+            <span class="card-dot error"></span>
+            <span class="card-dot warning"></span>
+            <span class="card-dot success"></span>
+          </div>
+          <div class="card-content">
+            <div class="code-line"><span class="keyword">import</span> {'{'} createAgentSession {'}'} <span class="keyword">from</span> <span class="string">"@mariozechner/pi-coding-agent"</span>;</div>
+            <div class="code-line">&nbsp;</div>
+            <div class="code-line"><span class="keyword">const</span> {'{'} session {'}'} = <span class="keyword">await</span> createAgentSession();</div>
+            <div class="code-line">&nbsp;</div>
+            <div class="code-line"><span class="keyword">await</span> session.prompt(<span class="string">"Hello, pi!"</span>);</div>
+            <div class="code-line">&nbsp;</div>
+            <div class="code-line code-output">
+              <span class="output-prefix">></span> Hello, pi!
+              <br>
+              <span class="assistant">◐ Thinking...</span>
+              <br>
+              <span class="assistant-text">Hello! I'm pi, a terminal coding harness.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Features Section -->
+    <section class="features">
+      <div class="feature">
+        <div class="feature-icon">▶</div>
+        <h3>Interactive Code Examples</h3>
+        <p>Watch simulated pi interactions play out in your browser</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">◐</div>
+        <h3>Animated Explanations</h3>
+        <p>Step-by-step animations show how pi processes requests</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">◎</div>
+        <h3>Interactive Diagrams</h3>
+        <p>Click through agent team hierarchies and system architectures</p>
+      </div>
+    </section>
+
+    <!-- Modules Section -->
+    <section class="modules" id="modules">
+      <h2 class="section-title">Learning Modules</h2>
+      <div class="module-grid">
+        <!-- Module 1: Getting Started -->
+        <a href="/docs/superpowers/chapters/module-1/0-what-is-pi" class="module-card">
+          <div class="module-number">01</div>
+          <h3 class="module-title">Getting Started</h3>
+          <p class="module-description">Install pi, configure API keys, and send your first prompt</p>
+          <ul class="module-chapters">
+            <li>What is pi?</li>
+            <li>Install in 5 minutes</li>
+            <li>Hello, pi!</li>
+          </ul>
+          <div class="module-meta">3 chapters • ~15 min</div>
+        </a>
+
+        <!-- Module 2: Core Workflow -->
+        <a href="/docs/superpowers/chapters/module-2/3-reading-files" class="module-card">
+          <div class="module-number">02</div>
+          <h3 class="module-title">Core Workflow</h3>
+          <p class="module-description">Master file operations, bash commands, sessions, and branching</p>
+          <ul class="module-chapters">
+            <li>Reading files</li>
+            <li>Writing & editing</li>
+            <li>Bash commands</li>
+            <li>Sessions</li>
+            <li>Branching & forks</li>
+          </ul>
+          <div class="module-meta">5 chapters • ~25 min</div>
+        </a>
+
+        <!-- Module 3: Extending pi -->
+        <a href="/docs/superpowers/chapters/module-3/8-extensions-intro" class="module-card">
+          <div class="module-number">03</div>
+          <h3 class="module-title">Extending pi</h3>
+          <p class="module-description">Build custom tools, commands, and learn the event system</p>
+          <ul class="module-chapters">
+            <li>Extensions intro</li>
+            <li>Your first tool</li>
+            <li>Commands & events</li>
+            <li>Event bus intro</li>
+          </ul>
+          <div class="module-meta">4 chapters • ~20 min</div>
+        </a>
+
+        <!-- Module 4: Advanced Topics -->
+        <a href="/docs/superpowers/chapters/module-a/1-agents-overview" class="module-card module-card-advanced">
+          <div class="module-number">A</div>
+          <h3 class="module-title">Advanced Topics</h3>
+          <p class="module-description">Multi-agent workflows, persistent memory, and event bus mastery</p>
+          <ul class="module-chapters">
+            <li>Agent Teams (6 chapters)</li>
+            <li>Persistent Memory (3 chapters)</li>
+            <li>Event Bus Deep Dive (3 chapters)</li>
+          </ul>
+          <div class="module-meta">12 chapters • ~60 min</div>
+        </a>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="landing-footer">
+      <p>Built with Astro • No server required • All client-side</p>
+    </footer>
+  </div>
+</body>
+</html>
+
+<style>
+  /* Landing Container */
+  .landing {
+    min-height: 100vh;
+    padding: var(--space-8);
+  }
+
+  /* Hero Section */
+  .hero {
+    max-width: 1200px;
+    margin: 0 auto var(--space-10);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-10);
+    align-items: center;
+  }
+
+  .hero-badge {
+    display: inline-block;
+    padding: var(--space-2) var(--space-4);
+    background-color: var(--accent-subtle);
+    color: var(--accent-primary);
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-radius: var(--radius-lg);
+    margin-bottom: var(--space-4);
+  }
+
+  .hero-title {
+    font-size: 3rem;
+    font-weight: 700;
+    line-height: 1.1;
+    margin-bottom: var(--space-4);
+  }
+
+  .accent {
+    color: var(--accent-primary);
+  }
+
+  .hero-subtitle {
+    font-size: 1.25rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin-bottom: var(--space-6);
+  }
+
+  .hero-actions {
+    display: flex;
+    gap: var(--space-4);
+  }
+
+  .btn-lg {
+    padding: var(--space-3) var(--space-6);
+    font-size: 1rem;
+  }
+
+  /* Hero Visual */
+  .hero-visual {
+    display: flex;
+    justify-content: center;
+  }
+
+  .visual-card {
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    width: 100%;
+    max-width: 450px;
+    overflow: hidden;
+    box-shadow: var(--shadow-lg);
+  }
+
+  .card-header {
+    display: flex;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-4);
+    background-color: var(--bg-elevated);
+    border-bottom: 1px solid var(--border-subtle);
+  }
+
+  .card-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+  }
+
+  .card-dot.error { background-color: var(--error); }
+  .card-dot.warning { background-color: var(--warning); }
+  .card-dot.success { background-color: var(--success); }
+
+  .card-content {
+    padding: var(--space-5);
+    font-family: var(--font-code);
+    font-size: 0.875rem;
+    line-height: 1.6;
+  }
+
+  .code-line {
+    white-space: pre;
+  }
+
+  .keyword { color: var(--accent-primary); }
+  .string { color: var(--success); }
+  .comment { color: var(--text-muted); }
+
+  .code-output {
+    margin-top: var(--space-4);
+    padding: var(--space-4);
+    background-color: var(--bg-deep);
+    border-radius: var(--radius-md);
+    color: var(--text-secondary);
+  }
+
+  .output-prefix {
+    color: var(--user-msg);
+  }
+
+  .assistant {
+    color: var(--thinking);
+    display: block;
+    margin: var(--space-2) 0;
+  }
+
+  .assistant-text {
+    color: var(--text-primary);
+  }
+
+  /* Features Section */
+  .features {
+    max-width: 900px;
+    margin: 0 auto var(--space-10);
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-6);
+  }
+
+  .feature {
+    text-align: center;
+    padding: var(--space-5);
+  }
+
+  .feature-icon {
+    font-size: 2rem;
+    margin-bottom: var(--space-3);
+    color: var(--accent-primary);
+  }
+
+  .feature h3 {
+    font-size: 1.125rem;
+    margin-bottom: var(--space-2);
+  }
+
+  .feature p {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+  }
+
+  /* Modules Section */
+  .modules {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .section-title {
+    text-align: center;
+    font-size: 2rem;
+    margin-bottom: var(--space-8);
+  }
+
+  .module-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-6);
+  }
+
+  .module-card {
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    padding: var(--space-6);
+    text-decoration: none;
+    color: var(--text-primary);
+    transition: all var(--transition-base);
+  }
+
+  .module-card:hover {
+    border-color: var(--accent-primary);
+    box-shadow: var(--shadow-glow);
+    transform: translateY(-4px);
+    text-decoration: none;
+  }
+
+  .module-card-advanced {
+    grid-column: span 2;
+    background: linear-gradient(135deg, var(--bg-surface) 0%, rgba(124, 58, 237, 0.1) 100%);
+    border-color: var(--accent-primary);
+  }
+
+  .module-number {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--accent-primary);
+    text-transform: uppercase;
+    margin-bottom: var(--space-3);
+  }
+
+  .module-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: var(--space-3);
+  }
+
+  .module-description {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    margin-bottom: var(--space-4);
+  }
+
+  .module-chapters {
+    list-style: none;
+    font-size: 0.8125rem;
+    color: var(--text-muted);
+    margin-bottom: var(--space-4);
+  }
+
+  .module-chapters li::before {
+    content: '• ';
+    color: var(--accent-primary);
+  }
+
+  .module-meta {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--border-subtle);
+  }
+
+  /* Footer */
+  .landing-footer {
+    text-align: center;
+    padding: var(--space-10) 0;
+    color: var(--text-muted);
+    font-size: 0.875rem;
+  }
+
+  /* Responsive */
+  @media (max-width: 1023px) {
+    .hero {
+      grid-template-columns: 1fr;
+      text-align: center;
+    }
+
+    .hero-actions {
+      justify-content: center;
+    }
+
+    .hero-visual {
+      order: -1;
+    }
+
+    .features {
+      grid-template-columns: 1fr;
+    }
+
+    .module-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .module-card-advanced {
+      grid-column: span 1;
+    }
+  }
+
+  @media (max-width: 767px) {
+    .landing {
+      padding: var(--space-4);
+    }
+
+    .hero-title {
+      font-size: 2rem;
+    }
+
+    .hero-subtitle {
+      font-size: 1rem;
+    }
+
+    .section-title {
+      font-size: 1.5rem;
+    }
+  }
+</style>

@@ -1,0 +1,129 @@
+---
+// Chapter Navigation Component - Previous/Next links
+
+interface Props {
+  prevTitle?: string;
+  prevHref?: string;
+  nextTitle?: string;
+  nextHref?: string;
+}
+
+const { prevTitle, prevHref, nextTitle, nextHref } = Astro.props;
+---
+
+<nav class="chapter-nav" aria-label="Chapter navigation">
+  <div class="nav-item nav-prev">
+    {prevHref && prevTitle ? (
+      <a href={prevHref} class="nav-link">
+        <span class="nav-arrow">◀</span>
+        <div class="nav-info">
+          <span class="nav-label">Previous</span>
+          <span class="nav-title">{prevTitle}</span>
+        </div>
+      </a>
+    ) : (
+      <div></div>
+    )}
+  </div>
+  <div class="nav-item nav-next">
+    {nextHref && nextTitle ? (
+      <a href={nextHref} class="nav-link">
+        <div class="nav-info">
+          <span class="nav-label">Next</span>
+          <span class="nav-title">{nextTitle}</span>
+        </div>
+        <span class="nav-arrow">▶</span>
+      </a>
+    ) : (
+      <div></div>
+    )}
+  </div>
+</nav>
+
+<style>
+  .chapter-nav {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-4);
+    margin-top: var(--space-8);
+    padding-top: var(--space-6);
+    border-top: 1px solid var(--border-subtle);
+  }
+
+  .nav-item {
+    flex: 1;
+  }
+
+  .nav-next {
+    text-align: right;
+  }
+
+  .nav-link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-4);
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    text-decoration: none;
+    color: var(--text-primary);
+    transition: all var(--transition-fast);
+  }
+
+  .nav-link:hover {
+    background-color: var(--bg-elevated);
+    border-color: var(--border-active);
+    text-decoration: none;
+  }
+
+  .nav-arrow {
+    font-size: 1.25rem;
+    color: var(--text-muted);
+    transition: transform var(--transition-fast);
+  }
+
+  .nav-link:hover .nav-arrow {
+    transform: translateX(-4px);
+  }
+
+  .nav-next .nav-link:hover .nav-arrow {
+    transform: translateX(4px);
+  }
+
+  .nav-info {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+  }
+
+  .nav-label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+  }
+
+  .nav-title {
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+
+  @media (max-width: 767px) {
+    .chapter-nav {
+      flex-direction: column;
+    }
+
+    .nav-item {
+      width: 100%;
+    }
+
+    .nav-next {
+      text-align: left;
+    }
+
+    .nav-link {
+      width: 100%;
+      justify-content: space-between;
+    }
+  }
+</style>
